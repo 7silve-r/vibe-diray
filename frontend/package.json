@@ -1,0 +1,33 @@
+{
+  "name": "vibe-random-notes",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "dompurify": "^3.2.4",
+    "lucide-vue-next": "^0.468.0",
+    "markdown-it": "^14.1.0",
+    "pinia": "^2.3.1",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^22.10.5",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "jsdom": "^26.0.0",
+    "prettier": "^3.9.9",
+    "typescript": "~5.6.2",
+    "vite": "^6.1.0",
+    "vitest": "^4.1.11",
+    "vue-tsc": "^2.2.0"
+  }
+}
