@@ -50,16 +50,17 @@ test('welcome', async ({ page }) => {
   await expect(page.getByRole('button', { name: '点击任意处开始' })).toBeVisible();
   await expect(page.locator('.gift-poem p')).toHaveCount(9);
   await expect(page.locator('.gift-poem')).toContainText('直起腰来，我望见蓝色的大海和帆影。');
+  await expect(page.locator('.enter-hint')).toContainText('Enter');
+  await page.locator('.welcome-character img').evaluate((img: HTMLImageElement) => img.decode());
   await page.screenshot({ animations: 'disabled', path: 'test-results/welcome-desktop.png' });
-  await page.keyboard.press('Tab');
   await page.keyboard.press('Enter');
-  await expect(page.getByText('听见 · 音乐')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '今日的一隅' })).toBeVisible();
   await page.screenshot({
     animations: 'disabled',
     path: 'test-results/home-desktop.png',
     fullPage: true,
   });
-  await page.getByRole('link', { name: /翻开你的故事/ }).click();
+  await page.getByRole('link', { name: '日记', exact: true }).click();
   await expect(page.getByRole('heading', { name: '随心 · 日记' })).toBeVisible();
 });
 test('login', async ({ page }) => {
@@ -142,7 +143,8 @@ test('mobile', async ({ page }) => {
     path: 'test-results/mobile-home.png',
     fullPage: true,
   });
-  await page.getByRole('link', { name: /翻开你的故事/ }).click();
+  await page.getByRole('button', { name: '切换侧边导航' }).click();
+  await page.getByRole('link', { name: '日记', exact: true }).click();
   await page.getByRole('button', { name: '＋ 写日记' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
 });
@@ -192,10 +194,10 @@ test('sidebar and states', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '这个页面不存在' })).toBeVisible();
   await expect(page.locator('.mood-lost')).toBeVisible();
   await page.getByRole('link', { name: '返回主页', exact: true }).click();
-  await expect(page.locator('.hero-character img')).toBeVisible();
+  await expect(page.locator('.studio-character img')).toBeVisible();
   expect(
     await page
-      .locator('.hero-character img')
+      .locator('.studio-character img')
       .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0),
   ).toBe(true);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -232,6 +234,48 @@ test('poem mobile and motion', async ({ page }) => {
     fullPage: true,
   });
   await page.getByRole('button', { name: '点击任意处开始' }).press('Enter');
-  await expect(page.locator('.hero-character img')).toBeVisible();
+  await expect(page.locator('.studio-character img')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('poetry', async ({ page }) => {
+  await setup(page);
+  await page.goto('/');
+  const authors = new Set<string>();
+  for (let n = 0; n < 4; n++) {
+    authors.add((await page.locator('.poem-credit').innerText()).split(' ·')[0]);
+    await page.getByRole('button', { name: '换一签' }).click();
+  }
+  expect(authors.size).toBe(4);
+  await expect(page.locator('main a[href="/music"], main a[href="/diary"]')).toHaveCount(0);
+});
+
+test('moment', async ({ page }) => {
+  await setup(page);
+  await page.goto('/');
+  await page.getByRole('button', { name: '晴朗', exact: true }).click();
+  await page.getByLabel('今日留笺', { exact: true }).fill('游客留笺');
+  await page.getByRole('button', { name: '留在今天' }).click();
+  await page.reload();
+  await expect(page.getByLabel('今日留笺', { exact: true })).toHaveValue('游客留笺');
+  await expect(page.getByRole('button', { name: '晴朗', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByRole('button', { name: '登录 / 注册' }).click();
+  await page.getByLabel('用户名').fill('ADMIN');
+  await page.getByLabel('密码', { exact: true }).fill('testpassword');
+  await page.getByRole('button', { name: '登录，继续旅程' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByLabel('今日留笺', { exact: true })).toHaveValue('');
+  await page.getByLabel('今日留笺', { exact: true }).fill('账号留笺');
+  await page.getByRole('button', { name: '留在今天' }).click();
+  await page.reload();
+  await expect(page.getByLabel('今日留笺', { exact: true })).toHaveValue('账号留笺');
+  await page.getByRole('button', { name: '清除今日留笺' }).click();
+  await page.reload();
+  await expect(page.getByLabel('今日留笺', { exact: true })).toHaveValue('');
+  await page.getByRole('link', { name: /管理员/ }).click();
+  await page.getByRole('button', { name: '退出登录' }).click();
+  await expect(page.getByLabel('今日留笺', { exact: true })).toHaveValue('游客留笺');
 });

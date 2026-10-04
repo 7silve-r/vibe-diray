@@ -30,7 +30,7 @@ java -jar music/target/music_backend-0.0.1-SNAPSHOT.jar
 
 新建空库时，依次执行 diary/sql/schema.sql 和 music/sql/schema.sql；两份脚本顶部默认使用 music_diary，如选择其他库需要相应修改。不要在旧表上直接执行 CREATE TABLE IF NOT EXISTS 来代替重建，它不会更新旧字段。
 
-已授权清空旧数据的场景，可将根目录 `.env.example` 复制为 `.env` 并填入本机连接信息，然后执行：
+需要重建本机开发数据时，可将根目录 `.env.example` 复制为 `.env` 并填入本机连接信息，然后执行：
 
 ```bash
 python scripts/reset_database.py --database music_diary
@@ -63,12 +63,10 @@ Spring Security 的过滤链负责身份认证，`@EnableMethodSecurity` 和 `@P
 
 注册沿用 diary 的用户名和密码方式；注册后通过验证码绑定邮箱，再使用邮箱找回密码。验证码5分钟有效、同邮箱同用途60秒发送间隔、最多5次错误尝试、使用后失效。修改资料中的邮箱会清除已验证标记，需要重新验证。
 
-## 测试和提交
+## 测试
 
-在 backend 目录执行 mvn test 可一次测试两个模块；IDEA 中也可运行各测试类。JUnit 方法名保持简短。测试使用 test profile 和 H2 内存数据库，邮件与 MinIO 测试使用模拟对象，不读取真实密码、不清理实际数据库、不发送真实邮件。
+在 backend 目录执行 mvn test 可一次测试两个模块；IDEA 中也可运行各测试类。测试使用 test profile 和 H2 内存数据库，邮件与 MinIO 测试使用模拟对象，不读取真实密码、不清理实际数据库、不发送真实邮件。
 
-真实 MySQL、MinIO 和 SMTP 的连通性需要你提供本机配置后另外验证；自动测试通过不表示这些外部服务已经连通。
+真实 MySQL、MinIO 和 SMTP 的连通性需要通过实际环境配置另外验证；自动测试通过不表示这些外部服务已经连通。
 
-每个大功能先测试再提交，提交信息使用 `<feat>: 中文信息`、`<fix>: 中文信息`、`<docs>: 中文信息`。功能分支完成后以 --no-ff 合并 main，并同时推送功能分支与 main。diary 分支保留日记阶段快照，完整的一体化程序位于最终 main。
-
-接口路径与请求参数见 API.md。前端需要更新新的公开日记、音乐路径及状态值；本次只改后端，没有同步修改前端。
+接口路径与请求参数见 API.md。完整客户端位于 ../frontend。

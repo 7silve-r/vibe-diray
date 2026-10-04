@@ -25,6 +25,17 @@ function unauthorized() {
   ui.authOpen = true;
 }
 function escape(e: KeyboardEvent) {
+  if (
+    welcome.value &&
+    !ui.authOpen &&
+    !ui.dialog &&
+    !e.isComposing &&
+    (e.key === 'Enter' || e.key === ' ')
+  ) {
+    e.preventDefault();
+    enter();
+    return;
+  }
   if (e.key === 'Escape') menuOpen.value = false;
 }
 onMounted(() => {
@@ -48,14 +59,18 @@ onBeforeUnmount(() => {
     tabindex="0"
     aria-label="点击任意处开始"
     @click="enter"
-    @keydown.enter="enter"
-    @keydown.space.prevent="enter"
   >
     <div class="welcome-copy glass">
       <h1>Vibe<br /><span>Random Notes</span></h1>
     </div>
+    <div class="welcome-character">
+      <div class="welcome-orbit" aria-hidden="true"></div>
+      <img src="/airi-cutout.png" alt="爱理全身插画" fetchpriority="high" />
+    </div>
     <GiftPoem />
-    <span class="start-hint">点击任意处开始</span>
+    <span class="start-hint"
+      >点击任意处开始<span class="enter-hint">或按 <kbd>Enter ↵</kbd></span></span
+    >
   </div>
   <template v-else>
     <a href="#main-content" class="skip-link">跳到正文</a>

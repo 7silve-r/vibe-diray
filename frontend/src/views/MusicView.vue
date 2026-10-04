@@ -133,7 +133,7 @@ ui.run(async () => {
     <div>
       <span class="eyebrow">MUSIC / 音楽</span>
       <h1>听见 · 音乐</h1>
-      <p>独坐幽篁里，弹琴复长啸。<small>王维 ·《竹里馆》</small></p>
+      <p>谁家玉笛暗飞声，散入春风满洛城。<small>李白 ·《春夜洛城闻笛》</small></p>
     </div>
     <RouterLink v-if="id" to="/music"><button>返回音乐</button></RouterLink>
   </header>
