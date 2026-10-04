@@ -310,7 +310,7 @@ watch(
     </div>
     <span v-if="auth.admin" class="badge">✧ 管理员 ADMIN</span>
   </header>
-  <StatePanel v-if="!auth.admin" class="glass">
+  <StatePanel v-if="!auth.admin">
     此页面仅对管理员开放。<button v-if="!auth.user" @click="auth.require()">登录</button>
   </StatePanel>
   <div v-else class="admin-layout">
@@ -324,7 +324,7 @@ watch(
         {{ c.title }}管理
       </button>
     </aside>
-    <section class="panel glass">
+    <section class="panel">
       <header class="row wrap">
         <h2>{{ config.title }}</h2>
         <button
@@ -367,7 +367,7 @@ watch(
         /><button>搜索</button>
       </form>
       <StatePanel v-if="loading" mood="loading" text="正在加载…" />
-      <StatePanel v-else-if="error" mood="error" class="glass">
+      <StatePanel v-else-if="error" mood="error">
         <p>{{ error }}</p>
         <button @click="load">重试</button>
       </StatePanel>

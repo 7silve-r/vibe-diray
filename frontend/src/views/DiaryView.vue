@@ -135,7 +135,7 @@ load();
     </select>
   </div>
   <StatePanel v-if="loading" mood="loading" text="正在加载日记…" />
-  <StatePanel v-else-if="error" mood="error" class="glass">
+  <StatePanel v-else-if="error" mood="error">
     <p role="alert">{{ error }}</p>
     <button @click="load">重新加载</button>
   </StatePanel>
@@ -144,7 +144,7 @@ load();
       v-for="item in rows"
       :key="item.id"
       :to="'/diary/' + item.id + (tab === 'mine' ? '?own=1' : '')"
-      class="card glass"
+      class="content-item"
       ><SmartImage v-if="item.coverImg" class="cover wide" :src="item.coverImg" /><span
         class="eyebrow"
         style="margin-top: 15px"
@@ -158,7 +158,7 @@ load();
       </div></RouterLink
     >
   </div>
-  <StatePanel v-else class="glass" :text="tab === 'mine' ? '你还没有写日记。' : '暂无日记。'">
+  <StatePanel v-else :text="tab === 'mine' ? '你还没有写日记。' : '暂无日记。'">
     <button @click="write">写下第一篇</button>
   </StatePanel>
   <Pager

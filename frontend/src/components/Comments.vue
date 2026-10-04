@@ -81,7 +81,7 @@ async function remove(row: any) {
 }
 </script>
 <template>
-  <section class="panel glass">
+  <section class="panel">
     <h2 class="comment-heading"><CharacterIcon />评论</h2>
     <form @submit.prevent="send">
       <textarea

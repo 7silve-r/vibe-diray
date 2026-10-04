@@ -133,14 +133,14 @@ watch(() => [auth.user?.id, route.params.id], init, { immediate: true });
     </div>
     <RouterLink to="/diary"><button>返回日记</button></RouterLink>
   </header>
-  <StatePanel v-if="!auth.user" class="glass">
+  <StatePanel v-if="!auth.user">
     <button class="primary" @click="auth.require()">登录后开始记录</button>
   </StatePanel>
-  <StatePanel v-else-if="error" mood="error" class="glass">
+  <StatePanel v-else-if="error" mood="error">
     <p>{{ error }}</p>
     <button @click="init">重新加载</button>
   </StatePanel>
-  <form v-else-if="ready" class="panel glass form" @submit.prevent="save">
+  <form v-else-if="ready" class="panel form" @submit.prevent="save">
     <div v-if="draft" class="row wrap">
       <span>发现这篇日记的本机草稿。</span><button type="button" @click="restore">恢复草稿</button
       ><button type="button" @click="discard">丢弃草稿</button>

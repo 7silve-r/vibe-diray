@@ -36,9 +36,7 @@ button,
 .cta {
   cursor: pointer;
   border: 1px solid var(--line);
-  background: #ffffff60;
   color: inherit;
-  border-radius: 24px;
   padding: 11px 18px;
   display: inline-flex;
   gap: 8px;
@@ -48,12 +46,15 @@ button,
     background 0.25s,
     box-shadow 0.25s,
     transform 0.25s;
+  background: transparent;
+  border-color: transparent;
+  border-radius: 10px;
 }
 button:hover:not(:disabled),
 .cta:hover {
-  background: #ffffffad;
-  box-shadow: 0 6px 22px #a5a0b917;
   transform: translateY(-2px);
+  background: #ffffff38;
+  box-shadow: none;
 }
 button:disabled {
   opacity: 0.45;
@@ -102,11 +103,12 @@ textarea,
 select {
   width: 100%;
   min-width: 0;
-  border: 1px solid #ffffffb0;
-  background: #ffffff62;
   color: var(--ink);
-  border-radius: 16px;
-  padding: 12px 14px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #b8a7c266;
+  border-radius: 0;
+  padding: 12px 4px;
 }
 input::placeholder,
 textarea::placeholder {
@@ -184,7 +186,7 @@ img {
   z-index: 12;
   display: flex;
   flex-direction: column;
-  background: #ffffff2e;
+  background: transparent;
 }
 .brand {
   display: flex;
@@ -216,10 +218,11 @@ img {
   gap: 12px;
   border: 1px solid transparent;
   padding: 14px 13px;
-  border-radius: 18px;
   color: #72707e;
   font-size: 13px;
   transition: 0.25s;
+  position: relative;
+  border-radius: 0;
 }
 .main-nav small {
   font-size: 8px;
@@ -229,14 +232,15 @@ img {
   opacity: 0.65;
 }
 .main-nav a:hover {
-  background: #ffffff45;
+  background: transparent;
+  color: #815e72;
 }
 .main-nav a.router-link-exact-active,
 .main-nav a.active {
-  background: #ffffff80;
   color: #815e72;
-  border-color: #ffffffa0;
-  box-shadow: 0 6px 24px #b8a5b30a;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 .sidebar-bottom {
   margin-top: auto;
@@ -274,8 +278,8 @@ img {
   font-size: 12px;
   min-height: 42px;
   max-width: 100%;
-  border-radius: 30px;
-  background: #ffffff48;
+  background: transparent;
+  border-radius: 0;
 }
 .account-pill img {
   width: 29px;
@@ -480,9 +484,9 @@ img {
 }
 .tabs button.active,
 .active {
-  background: #ffffff75;
   color: #805b72;
-  border-color: #ffffffaa;
+  background: transparent;
+  border-color: transparent;
 }
 .primary {
   background: #eed6e5;
@@ -515,7 +519,7 @@ button.primary:hover:not(:disabled) {
   max-width: 180px;
 }
 .panel {
-  padding: 28px;
+  padding: 28px 0;
   margin-bottom: 24px;
 }
 .empty {
@@ -547,24 +551,25 @@ button.primary:hover:not(:disabled) {
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 22px;
+  gap: 34px 28px;
 }
-.card {
-  padding: 20px;
+.content-item {
   min-width: 0;
   transition:
     transform 0.3s,
     background 0.3s;
+  padding: 0 0 24px;
+  border-bottom: 1px solid #bcaaca38;
 }
-a.card:hover {
+a.content-item:hover {
   transform: translateY(-3px);
-  background: #ffffff60;
+  background: transparent;
 }
-.card h3 {
+.content-item h3 {
   font-size: 18px;
   margin: 16px 0 10px;
 }
-.card p {
+.content-item p {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.9;
@@ -591,7 +596,7 @@ a.card:hover {
   align-items: center;
   gap: 18px;
   padding: 14px 12px;
-  border-bottom: 1px solid #ffffff85;
+  border-bottom: 1px solid #bcaaca38;
 }
 .song-row:last-child {
   border: 0;
@@ -1100,6 +1105,8 @@ td button {
     gap: 7px;
     padding: 12px 0;
     font-size: 10px;
+    position: relative;
+    border-radius: 0;
   }
   .sidebar-bottom {
     justify-content: center;
@@ -1170,6 +1177,8 @@ td button {
     flex-direction: row;
     padding: 14px 12px;
     font-size: 13px;
+    position: relative;
+    border-radius: 0;
   }
   .sidebar-bottom {
     justify-content: space-between;
@@ -1205,6 +1214,8 @@ td button {
   .account-pill {
     font-size: 11px;
     padding: 8px 12px;
+    background: transparent;
+    border-radius: 0;
   }
   .account-pill .truncate {
     max-width: 115px;
@@ -1239,7 +1250,7 @@ td button {
     white-space: nowrap;
   }
   .panel {
-    padding: 20px;
+    padding: 20px 0;
   }
   .detail-hero {
     align-items: flex-start;
@@ -1261,6 +1272,7 @@ td button {
   .song-row {
     gap: 10px;
     padding-inline: 0;
+    border-bottom: 1px solid #bcaaca38;
   }
   .song-row .index {
     display: none;
@@ -1539,27 +1551,27 @@ td button {
   color: #a79bab;
   letter-spacing: 0.2em;
 }
-.poetry-card {
+.poetry-feature {
   grid-area: poetry;
   align-self: start;
   position: relative;
-  padding: 25px 30px;
-  background: linear-gradient(125deg, #ffffff7a, #ffffff22);
-  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 0.35s;
+  padding: 20px 0 20px 24px;
+  background: transparent;
+  transform: none;
+  transition: none;
 }
-.poetry-card:before {
+.poetry-feature:before {
   content: '';
   position: absolute;
-  width: 34px;
-  height: 11px;
-  background: #d7cae244;
-  border: 1px solid #ffffff55;
-  top: -6px;
-  left: 32px;
-  transform: rotate(-7deg);
+  width: 1px;
+  height: 75%;
+  top: 12%;
+  left: 0;
+  background: linear-gradient(transparent, #b69cbe55, transparent);
+  border: 0;
+  transform: none;
 }
-.poetry-card .eyebrow {
+.poetry-feature .eyebrow {
   margin: 0;
   font-size: 10px;
 }
@@ -1568,7 +1580,7 @@ td button {
   color: #a395a8;
   letter-spacing: 0.14em;
 }
-.poetry-card blockquote {
+.poetry-feature blockquote {
   margin: 30px 0;
   font-family: 'Noto Serif SC', 'Songti SC', SimSun, serif;
   font-size: clamp(20px, 2.3vw, 30px);
@@ -1577,7 +1589,7 @@ td button {
   color: #696273;
   animation: arrive 0.45s both;
 }
-.poetry-card blockquote p {
+.poetry-feature blockquote p {
   margin: 0;
 }
 .poem-credit {
@@ -1597,8 +1609,9 @@ td button {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   gap: 40px;
-  padding: 32px;
   margin-top: 30px;
+  padding: 38px 0 0;
+  border-top: 1px solid #bcaaca38;
 }
 .moment-heading h2 {
   font-size: 23px;
@@ -1642,14 +1655,16 @@ td button {
   color: #817587;
 }
 .mood-options button.selected {
-  border-color: #d6bdce;
-  background: #ffffffb5;
   color: #725468;
+  background: transparent;
+  border-color: transparent;
+  border-bottom-color: #b692ac;
+  border-radius: 0;
 }
 .moment-form textarea {
   min-height: 95px;
   font-size: 13px;
-  background: #ffffff38;
+  background: transparent;
 }
 .moment-actions {
   margin-top: 12px;
@@ -1676,15 +1691,16 @@ td button {
   .studio-character {
     height: 480px;
   }
-  .poetry-card {
-    padding: 23px;
+  .poetry-feature {
+    padding: 20px 0 20px 24px;
   }
-  .poetry-card blockquote {
+  .poetry-feature blockquote {
     font-size: 23px;
   }
   .moment {
     gap: 22px;
-    padding: 25px;
+    padding: 28px 0 0;
+    border-top: 1px solid #bcaaca38;
   }
 }
 @media (max-width: 800px) {
@@ -1717,15 +1733,17 @@ td button {
   .studio-heading h1 {
     font-size: 36px;
   }
-  .poetry-card blockquote {
+  .poetry-feature blockquote {
     font-size: 21px;
     letter-spacing: 0.04em;
   }
-  .poetry-card .row:last-child {
+  .poetry-feature .row:last-child {
     flex-wrap: wrap;
   }
   .moment {
     grid-template-columns: 1fr;
+    padding: 28px 0 0;
+    border-top: 1px solid #bcaaca38;
   }
   .moment-heading {
     position: relative;
@@ -1798,10 +1816,10 @@ td button {
   .studio-orbit {
     width: 95%;
   }
-  .poetry-card {
-    padding: 23px;
+  .poetry-feature {
+    padding: 20px 0 20px 24px;
   }
-  .poetry-card blockquote {
+  .poetry-feature blockquote {
     font-size: 25px;
     margin: 25px 0;
   }
@@ -1809,9 +1827,10 @@ td button {
     display: none;
   }
   .moment {
-    padding: 22px;
     margin-top: 14px;
     gap: 18px;
+    padding: 28px 0 0;
+    border-top: 1px solid #bcaaca38;
   }
   .moment-heading h2 {
     font-size: 20px;
@@ -1834,8 +1853,8 @@ td button {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .poetry-card,
-  .poetry-card blockquote,
+  .poetry-feature,
+  .poetry-feature blockquote,
   .start-hint {
     animation: none;
     transition: none;
@@ -1856,4 +1875,81 @@ td button {
 .welcome-orbit {
   width: 100%;
   transform: none;
+}
+
+.sidebar::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 140px;
+  bottom: 100px;
+  width: 1px;
+  background: linear-gradient(transparent, #bcaaca38, transparent);
+}
+
+.main-nav a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 14px;
+  border-radius: 3px;
+  background: #ba96af;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.main-nav a.router-link-exact-active::before,
+.main-nav a.active::before {
+  opacity: 1;
+}
+
+.tabs button {
+  border-radius: 0;
+}
+
+.tabs button.active {
+  border-bottom-color: #b692ac;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-bottom-color: #9d7f9c;
+}
+
+.account-grid > .panel {
+  border-top: 1px solid #bcaaca38;
+}
+
+.editor-grid .markdown {
+  padding-left: 22px;
+  border-left: 1px solid #bcaaca38;
+}
+
+.player-dock:not(.expanded) {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+@media (max-width: 900px) {
+  .editor-grid .markdown {
+    padding: 22px 0 0;
+    border-left: 0;
+    border-top: 1px solid #bcaaca38;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar::after {
+    display: none;
+  }
+  .sidebar.open {
+    backdrop-filter: blur(24px);
+    border-radius: 18px;
+    border: 1px solid #ffffffaa;
+  }
 }
