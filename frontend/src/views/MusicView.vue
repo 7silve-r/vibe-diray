@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StatePanel from '../components/StatePanel.vue';
 import { ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '../api';
@@ -130,17 +131,17 @@ ui.run(async () => {
 <template>
   <header class="section-head">
     <div>
-      <span class="eyebrow">YOUR DAILY SOUNDTRACK</span>
+      <span class="eyebrow">MUSIC / 音楽</span>
       <h1>听见 · 音乐</h1>
-      <p>把世界调小一点，把喜欢的歌放大一点。</p>
+      <p>独坐幽篁里，弹琴复长啸。<small>王维 ·《竹里馆》</small></p>
     </div>
     <RouterLink v-if="id" to="/music"><button>返回音乐</button></RouterLink>
   </header>
-  <div v-if="error" class="empty glass">
+  <StatePanel v-if="error" mood="error" class="glass">
     <p role="alert">{{ error }}</p>
     <button @click="load">重新加载</button>
-  </div>
-  <p v-else-if="loading" class="empty">正在寻找旋律…</p>
+  </StatePanel>
+  <StatePanel v-else-if="loading" mood="loading" text="正在加载音乐…" />
   <template v-else-if="detail"
     ><section class="detail-hero glass panel">
       <SmartImage class="cover" :src="detail.coverUrl || detail.avatar" />
@@ -246,7 +247,7 @@ ui.run(async () => {
         ></RouterLink
       >
     </div>
-    <p v-else class="empty glass">暂时没有找到内容，换个关键词试试吧。</p>
+    <StatePanel v-else class="glass" text="暂时没有找到内容，换个关键词试试吧。" />
     <section v-if="tab === 'recommended' && recommendedLists.length" class="panel glass">
       <h2>灵感歌单</h2>
       <div class="grid">

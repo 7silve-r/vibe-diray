@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StatePanel from './StatePanel.vue';
 import { Play, Heart } from 'lucide-vue-next';
 import { usePlayer } from '../stores/player';
 import { useAuth } from '../stores/auth';
@@ -25,9 +26,7 @@ async function collect(song: any) {
 }
 </script>
 <template>
-  <div v-if="!songs.length" class="empty">
-    这里还很安静。<br /><span class="tiny">歌曲上传后，就能在这里与你相遇。</span>
-  </div>
+  <StatePanel v-if="!songs.length" text="暂无歌曲。" />
   <div v-for="(song, i) in songs" :key="song.songId" class="song-row">
     <span class="index">{{ String(i + 1).padStart(2, '0') }}</span
     ><SmartImage class="cover" :src="song.coverUrl" /><RouterLink

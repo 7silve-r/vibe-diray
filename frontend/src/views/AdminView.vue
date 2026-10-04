@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StatePanel from '../components/StatePanel.vue';
 import { ref, computed, watch } from 'vue';
 import { api, query, upload } from '../api';
 import { useAuth } from '../stores/auth';
@@ -303,15 +304,15 @@ watch(
 <template>
   <header class="section-head">
     <div>
-      <span class="eyebrow">CARE FOR THIS LITTLE WORLD</span>
+      <span class="eyebrow">ADMIN / 管理</span>
       <h1>管理中心</h1>
-      <p>用心维护每一首音乐、每一次相遇。</p>
+      <p>音乐、公开日记与账号管理</p>
     </div>
     <span v-if="auth.admin" class="badge">✧ 管理员 ADMIN</span>
   </header>
-  <div v-if="!auth.admin" class="empty glass">
+  <StatePanel v-if="!auth.admin" class="glass">
     此页面仅对管理员开放。<button v-if="!auth.user" @click="auth.require()">登录</button>
-  </div>
+  </StatePanel>
   <div v-else class="admin-layout">
     <aside class="admin-menu">
       <button
@@ -365,11 +366,11 @@ watch(
           aria-label="管理搜索"
         /><button>搜索</button>
       </form>
-      <p v-if="loading" class="empty">正在加载…</p>
-      <div v-else-if="error" class="empty">
+      <StatePanel v-if="loading" mood="loading" text="正在加载…" />
+      <StatePanel v-else-if="error" mood="error" class="glass">
         <p>{{ error }}</p>
         <button @click="load">重试</button>
-      </div>
+      </StatePanel>
       <template v-else
         ><div class="table-wrap">
           <table>
@@ -444,7 +445,7 @@ watch(
             </tbody>
           </table>
         </div>
-        <p v-if="!rows.length" class="empty">暂无{{ config.title }}，可以从新建开始。</p>
+        <StatePanel v-if="!rows.length" :text="`暂无${config.title}，可以从新建开始。`" />
         <button v-if="config.batch && selected.length" class="danger" @click="batch">
           删除所选 {{ selected.length }} 项</button
         ><Pager

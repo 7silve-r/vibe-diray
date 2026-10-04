@@ -58,7 +58,7 @@ async function submit() {
 </script>
 <template>
   <Modal title="很高兴遇见你" @close="ui.authOpen = false"
-    ><p class="muted">一个账号，收藏旋律，也安放日常。</p>
+    ><p class="muted">使用同一账号访问音乐与日记。</p>
     <div class="tabs">
       <button :class="{ active: mode === 'login' }" @click="mode = 'login'">登录</button
       ><button :class="{ active: mode === 'register' }" @click="mode = 'register'">注册</button>

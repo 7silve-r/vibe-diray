@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import StatePanel from '../components/StatePanel.vue';
+import CharacterIcon from '../components/CharacterIcon.vue';
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { api, query, upload } from '../api';
@@ -73,25 +75,29 @@ async function remove() {
 <template>
   <header class="section-head">
     <div>
-      <span class="eyebrow">YOUR LITTLE CORNER</span>
+      <span class="eyebrow">PROFILE / 我的空间</span>
       <h1>我的空间</h1>
     </div>
     <RouterLink v-if="auth.admin" to="/admin"
       ><button class="primary">✧ 管理中心</button></RouterLink
     >
   </header>
-  <div v-if="!auth.user" class="empty glass">
-    <p>登录后，继续照顾你的音乐与日常。</p>
+  <StatePanel v-if="!auth.user" class="glass">
+    <p>登录后可管理个人资料、收藏和日记。</p>
     <button @click="auth.require()">登录 / 注册</button>
-  </div>
+  </StatePanel>
   <template v-else
     ><div class="row panel glass">
       <div class="row">
-        <SmartImage class="avatar-large" :src="auth.user.userPic" />
+        <SmartImage
+          v-if="auth.user.userPic"
+          class="avatar-large"
+          :src="auth.user.userPic"
+        /><CharacterIcon v-else class="profile-character" />
         <div>
           <h2>{{ auth.user.nickname || auth.user.username }}</h2>
           <span v-if="auth.admin" class="badge">管理员 · ADMIN</span
-          ><span v-else class="muted">很高兴在这里遇见你</span>
+          ><span v-else class="muted">个人账号</span>
         </div>
       </div>
       <button

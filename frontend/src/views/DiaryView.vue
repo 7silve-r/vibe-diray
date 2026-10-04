@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StatePanel from '../components/StatePanel.vue';
 import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api, query } from '../api';
@@ -85,9 +86,9 @@ load();
 <template>
   <header class="section-head">
     <div>
-      <span class="eyebrow">SMALL MOMENTS, SOFTLY KEPT</span>
+      <span class="eyebrow">DIARY / 日記</span>
       <h1>随心 · 日记</h1>
-      <p>今天的心情，也值得拥有一页。</p>
+      <p>人闲桂花落，夜静春山空。<small>王维 ·《鸟鸣涧》</small></p>
     </div>
     <button class="primary" @click="write">＋ 写日记</button>
   </header>
@@ -133,11 +134,11 @@ load();
       <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.cateName }}</option>
     </select>
   </div>
-  <p v-if="loading" class="empty">正在翻开日记…</p>
-  <div v-else-if="error" class="empty glass">
+  <StatePanel v-if="loading" mood="loading" text="正在加载日记…" />
+  <StatePanel v-else-if="error" mood="error" class="glass">
     <p role="alert">{{ error }}</p>
     <button @click="load">重新加载</button>
-  </div>
+  </StatePanel>
   <div v-else-if="rows.length" class="grid">
     <RouterLink
       v-for="item in rows"
@@ -157,15 +158,9 @@ load();
       </div></RouterLink
     >
   </div>
-  <div v-else class="empty glass">
-    <h2>留白，也是一种开始。</h2>
-    <p>
-      {{
-        tab === 'mine' ? '写下今天发生的一件小事吧。' : '这里还没有故事，等一阵风，也等你的分享。'
-      }}
-    </p>
+  <StatePanel v-else class="glass" :text="tab === 'mine' ? '你还没有写日记。' : '暂无日记。'">
     <button @click="write">写下第一篇</button>
-  </div>
+  </StatePanel>
   <Pager
     :page="page"
     :total="total"
