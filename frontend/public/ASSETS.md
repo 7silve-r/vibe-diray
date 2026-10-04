@@ -1,11 +1,20 @@
-# 素材与文字来源
+# 素材与诗文来源
 
-- `airi-full.png`：用户确认的全身像，使用 imagegen 参照用户提供的《蔚蓝档案》爱理原画生成，保留提包、手持冰淇淋和抬腿姿态。属于已有角色的衍生图像，不标注为原创角色。
-- `airi-cutout.png`：从确认的全身像通过 imagegen 制作的透明背景展示版本。首页使用此文件，保留原图备查。
-- `airi-stickers.png`：基于上述确认图生成的六种表情，同一角色用于头像、加载、成功、错误、空状态和 404。通过 CSS 雪碧图定位显示，没有另外加工图片。
-- `garden.png`：旧版生成插画，保留文件但新版页面不再引用。
-- 欢迎页《礼物》全文由用户在会话中提供，作者为切斯瓦夫·米沃什；按用户提供的文字和分行收录，译者未提供。
-- 王维《鸟鸣涧》：https://zh.wikisource.org/zh-hans/鳥鳴澗
-- 王维《竹里馆》：https://zh.wikisource.org/zh-hans/竹里館_(王維)
-- 古诗文字核对于 2026-10-04；页面显示篇名和作者。操作提示采用普通说明文字。
-- 功能图标来自 lucide-vue-next（ISC License）。字体使用本机 Inter、Segoe UI、苹方、微软雅黑等回退，不请求外部字体服务。
+- `airi-full.png`：参照《蔚蓝档案》爱理原画生成的全身图，属于既有角色衍生图像。
+- `airi-cutout.png`：全身图的透明背景展示版本，用于欢迎页和主页。
+- `airi-stickers.png`：同一角色的六种状态表情，使用 CSS 定位显示。
+- 以上插画由 imagegen 生成。功能图标来自 lucide-vue-next（ISC License）；字体使用设备字体。
+- 欢迎页《礼物》作者为切斯瓦夫·米沃什，采用提供的九行中文译文，译者未署名。
+
+## 古诗出处
+
+主页诗签轮换四位作者的作品；音乐与日记页分别使用另外两位作者的诗句，不重复首页诗签。
+
+- 陶渊明《饮酒·其五》：https://zh.wikisource.org/wiki/陶淵明集/卷三
+- 苏轼《定风波》：https://zh.wikisource.org/zh/定風波_(莫聽穿林打葉聲)
+- 杜甫《春夜喜雨》：https://zh.wikisource.org/zh-hans/春夜喜雨
+- 白居易《池上二绝·其二》：https://zh.wikisource.org/zh-hans/池上二絕
+- 李白《春夜洛城闻笛》：https://zh.wikisource.org/zh-hans/春夜洛城聞笛
+- 李清照《如梦令》：https://sourcebook.stanford.edu/text/li_qingzhao_often_recall/index.html
+
+古诗原文于 2026-10-04 核对；页面显示作者和篇名。

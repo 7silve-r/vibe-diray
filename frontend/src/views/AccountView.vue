@@ -65,7 +65,7 @@ async function remove() {
     const id = auth.user.id;
     await api('/my/account', 'DELETE');
     Object.keys(localStorage)
-      .filter((k) => k.startsWith(`vibe-draft:${id}:`))
+      .filter((k) => k.startsWith(`vibe-draft:${id}:`) || k.startsWith(`vibe-moment:${id}:`))
       .forEach((k) => localStorage.removeItem(k));
     auth.clear();
     router.push('/');

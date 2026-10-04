@@ -341,48 +341,6 @@ img {
 .skip-link:focus {
   top: 12px;
 }
-.welcome {
-  min-height: 100svh;
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  cursor: pointer;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
-  align-items: center;
-  gap: 6vw;
-  padding: 8vw;
-  overflow-y: auto;
-  background:
-    radial-gradient(ellipse at 24% 42%, #becbe645, transparent 58%),
-    radial-gradient(ellipse at 78% 20%, #ffc7da40, transparent 48%);
-}
-.welcome-copy {
-  padding: 40px 30px 44px;
-  background: linear-gradient(130deg, #ffffff24, #ffffff09);
-  border-color: #ffffff55;
-  box-shadow:
-    inset 0 1px 1px #ffffff60,
-    0 25px 80px #9c92b009;
-}
-.welcome h1,
-.hero-title h1 {
-  font-family: Inter, 'Segoe UI', sans-serif;
-  font-weight: 300;
-  letter-spacing: 0.045em;
-  line-height: 1.16;
-  margin: 0;
-}
-.welcome h1 {
-  font-size: clamp(56px, 6.2vw, 110px);
-  color: #fff;
-  text-shadow: 0 1px 22px #9b87952a;
-}
-.welcome h1 span {
-  font-size: 0.58em;
-  letter-spacing: 0.025em;
-  white-space: nowrap;
-}
 .gift-poem {
   padding: 18px 0 18px 28px;
   border-left: 1px solid #ffffffb0;
@@ -425,172 +383,8 @@ img {
   color: #777281;
   animation: breathe 3.8s ease-in-out infinite;
 }
-.home-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  position: relative;
-  min-height: 580px;
-  align-items: center;
-  margin-top: -25px;
-  margin-bottom: 60px;
-}
-.hero-copy {
-  position: relative;
-  z-index: 2;
-  padding: 20px 0;
-}
-.hero-copy > .eyebrow {
-  margin-left: 21px;
-  margin-bottom: 25px;
-  color: #958493;
-  font-size: 11px;
-}
-.hero-title {
-  padding: 25px 25px 31px;
-  background: linear-gradient(120deg, #ffffff36, #ffffff12);
-  border-color: #ffffff8a;
-  position: relative;
-  width: 114%;
-}
-.hero-title h1 {
-  font-size: clamp(52px, 5.2vw, 86px);
-  color: #fff;
-  text-shadow: 0 1px 18px #9c819b38;
-}
-.hero-title h1 span {
-  font-size: 0.63em;
-  white-space: nowrap;
-  letter-spacing: 0.015em;
-}
-.hero-verse {
-  margin: 30px 0 10px 22px;
-  color: #797482;
-  font:
-    14px/1.9 'Noto Serif SC',
-    'Songti SC',
-    SimSun,
-    serif;
-  letter-spacing: 0.14em;
-}
-.poetry-source {
-  font-size: 10px;
-  color: #8b8290;
-  letter-spacing: 0.12em;
-  margin-left: 22px;
-}
-.poetry-source:hover {
-  text-decoration: underline;
-}
-.hero-copy .actions {
-  margin: 30px 0 0 20px;
-  align-items: center;
-  gap: 23px;
-}
-.cta,
-.text-link {
+.cta {
   font-size: 12px;
-}
-.text-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--muted);
-}
-.hero-character {
-  position: relative;
-  height: 590px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  isolation: auto;
-}
-.hero-character img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  mix-blend-mode: normal;
-  position: relative;
-  z-index: 1;
-}
-.character-halo {
-  position: absolute;
-  width: 90%;
-  height: 58%;
-  top: 15%;
-  border: 1px solid #ffffff95;
-  border-radius: 50% 48% 42% 52%;
-  background: linear-gradient(150deg, #ffffff40, #ffdae930);
-  box-shadow:
-    0 0 70px #ffffff70,
-    inset 0 0 30px #ffffff65;
-  transform: rotate(-15deg);
-}
-.character-spark {
-  position: absolute;
-  right: 6%;
-  top: 15%;
-  color: #bcaac2;
-  font-size: 27px;
-  z-index: 2;
-}
-.hero-number {
-  position: absolute;
-  bottom: 10px;
-  left: 20px;
-  font-size: 8px;
-  letter-spacing: 0.2em;
-  color: #98909f;
-}
-.section-kicker {
-  display: flex;
-  justify-content: space-between;
-  margin: 0 5px 22px;
-  color: var(--muted);
-  font-size: 10px;
-  letter-spacing: 0.15em;
-}
-.section-kicker span:last-child {
-  font-size: 8px;
-}
-.portals {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-.portal {
-  overflow: hidden;
-  position: relative;
-  min-height: 285px;
-  padding: 30px;
-  display: flex;
-  align-items: center;
-  transition:
-    transform 0.35s,
-    background 0.35s,
-    border-color 0.35s;
-  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-}
-.portal:hover {
-  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-3px);
-  border-color: #fff;
-}
-.portal > div:first-child {
-  position: relative;
-  z-index: 1;
-  max-width: 74%;
-}
-.portal h2 {
-  font-size: 27px;
-  margin: 15px 0;
-}
-.portal p {
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.8;
-  margin-bottom: 6px;
-}
-.portal small {
-  font-size: 10px;
 }
 .portal-link {
   display: flex;
@@ -598,79 +392,6 @@ img {
   gap: 25px;
   margin-top: 32px;
   font-size: 11px;
-}
-.music-portal {
-  background: linear-gradient(125deg, #ffffff60, #d7e4ff35);
-}
-.diary-portal {
-  background: linear-gradient(125deg, #ffffff60, #ffe0eb35);
-}
-.record-art {
-  position: absolute;
-  right: -50px;
-  bottom: 40px;
-  width: 170px;
-  height: 170px;
-  border-radius: 50%;
-  background: repeating-radial-gradient(#383841 0 2px, #4c4b55 3px 4px);
-  box-shadow: 10px 18px 30px #55556b20;
-  display: grid;
-  place-items: center;
-  transform: rotate(-20deg);
-}
-.record-label {
-  width: 62px;
-  height: 62px;
-  background: #d4dff2;
-  color: #787489;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-}
-.notebook-art {
-  position: absolute;
-  right: -20px;
-  bottom: 42px;
-  width: 110px;
-  height: 150px;
-  background: linear-gradient(120deg, #f3dae6, #e9ddea);
-  transform: rotate(12deg);
-  border-radius: 4px 14px 14px 4px;
-  border-left: 5px solid #d6baca;
-  box-shadow:
-    4px 4px #ffffffb0,
-    12px 18px 25px #9d8a9c1c;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 17px;
-  color: #a0899d;
-}
-.notebook-art span {
-  font-size: 10px;
-}
-.home-profile {
-  margin-top: 70px;
-  padding: 24px 30px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.home-profile h2 {
-  margin-bottom: 6px;
-  font-size: 20px;
-}
-.home-profile .eyebrow {
-  font-size: 8px;
-  margin-bottom: 10px;
-}
-.home-profile p {
-  font-size: 12px;
-  margin: 0;
-}
-.home-profile > :last-child {
-  margin-left: auto;
 }
 .character-icon {
   display: inline-block;
@@ -1329,10 +1050,7 @@ td button {
     transform: translateY(0);
   }
 }
-.home-hero,
-.section-head,
-.portal-section,
-.home-profile {
+.section-head {
   animation: arrive 0.7s ease-out both;
 }
 @media (min-width: 1700px) {
@@ -1359,34 +1077,8 @@ td button {
     margin-left: 245px;
     margin-right: 30px;
   }
-  .home-hero {
-    min-height: 510px;
-    margin-bottom: 40px;
-  }
-  .hero-character {
-    height: 510px;
-  }
-  .hero-title h1 {
-    font-size: 60px;
-  }
-  .portal {
-    padding: 25px;
-  }
-  .portal h2 {
-    font-size: 23px;
-  }
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .welcome {
-    padding: 6vw;
-    gap: 4vw;
-  }
-  .welcome-copy {
-    padding-inline: 25px;
-  }
-  .welcome h1 {
-    font-size: 68px;
   }
   .admin-layout {
     grid-template-columns: 1fr;
@@ -1435,57 +1127,9 @@ td button {
     margin-left: 110px;
     padding-right: 25px;
   }
-  .portals {
-    grid-template-columns: 1fr;
-  }
-  .record-art {
-    right: 20px;
-    bottom: 30px;
-    width: 195px;
-    height: 195px;
-  }
-  .notebook-art {
-    right: 40px;
-  }
-  .portal > div:first-child {
-    max-width: 65%;
-  }
-  .portal {
-    min-height: 260px;
-  }
   .account-grid,
   .editor-grid {
     grid-template-columns: 1fr;
-  }
-  .hero-title h1 {
-    font-size: 51px;
-  }
-  .hero-character {
-    height: 470px;
-  }
-  .hero-title {
-    padding: 22px 20px;
-  }
-  .hero-verse {
-    font-size: 12px;
-    letter-spacing: 0.03em;
-  }
-  .hero-copy .actions {
-    gap: 12px;
-  }
-  .welcome {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    align-content: center;
-    padding: 55px 10vw 95px;
-  }
-  .welcome-copy {
-    max-width: 600px;
-    width: 100%;
-    margin: auto;
-  }
-  .welcome h1 {
-    font-size: clamp(55px, 10vw, 90px);
   }
   .gift-poem {
     margin: 0 0 0 auto;
@@ -1593,111 +1237,6 @@ td button {
   .skip-link {
     left: 65px;
   }
-  .home-hero {
-    min-height: 490px;
-    grid-template-columns: 1.1fr 1fr;
-    margin-top: 0;
-    margin-bottom: 30px;
-    align-items: start;
-  }
-  .hero-copy {
-    padding-top: 28px;
-  }
-  .hero-copy > .eyebrow {
-    margin-left: 10px;
-    font-size: 9px;
-    letter-spacing: 0.14em;
-  }
-  .hero-title {
-    padding: 19px 15px;
-    width: 173%;
-  }
-  .hero-title h1 {
-    font-size: 48px;
-  }
-  .hero-title h1 span {
-    font-size: 0.58em;
-  }
-  .hero-character {
-    height: 320px;
-    margin-top: 170px;
-    margin-left: -38px;
-  }
-  .hero-verse {
-    margin: 28px 0 8px 10px;
-    width: 158%;
-    font-size: 11px;
-    letter-spacing: 0.02em;
-  }
-  .poetry-source {
-    margin-left: 10px;
-    font-size: 9px;
-  }
-  .hero-copy .actions {
-    margin: 22px 0 0 10px;
-    gap: 16px;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .hero-copy .cta {
-    padding: 10px 13px;
-  }
-  .hero-number {
-    left: 10px;
-    bottom: 15px;
-  }
-  .hero-character .character-halo {
-    top: 15%;
-    height: 65%;
-  }
-  .hero-character .character-spark {
-    top: 7%;
-    right: 0;
-    font-size: 18px;
-  }
-  .section-kicker {
-    margin-top: 22px;
-  }
-  .portal {
-    padding: 26px;
-    min-height: 260px;
-  }
-  .portal h2 {
-    font-size: 24px;
-  }
-  .portal p {
-    font-size: 11px;
-  }
-  .portal > div:first-child {
-    max-width: 76%;
-  }
-  .record-art {
-    width: 145px;
-    height: 145px;
-    right: -42px;
-    bottom: 45px;
-  }
-  .notebook-art {
-    right: -22px;
-    width: 95px;
-    height: 135px;
-    bottom: 50px;
-  }
-  .home-profile {
-    margin-top: 35px;
-    padding: 20px;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .home-profile .character-icon {
-    width: 52px;
-  }
-  .home-profile > :last-child {
-    margin-left: 64px;
-  }
-  .home-profile p {
-    font-size: 11px;
-  }
   .grid {
     grid-template-columns: 1fr;
   }
@@ -1743,23 +1282,6 @@ td button {
   .form .row {
     flex-wrap: wrap;
   }
-  .welcome {
-    padding: 35px 26px 70px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    justify-content: center;
-    align-items: stretch;
-  }
-  .welcome-copy {
-    padding: 25px 22px 30px;
-  }
-  .welcome h1 {
-    font-size: 57px;
-  }
-  .welcome h1 span {
-    font-size: 0.5em;
-  }
   .gift-poem {
     width: auto;
     margin: 0 0 0 12px;
@@ -1780,12 +1302,6 @@ td button {
     padding: 24px;
   }
 }
-@media (max-height: 650px) {
-  .welcome {
-    position: relative;
-    min-height: 100svh;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   *,
   *:before,
@@ -1794,55 +1310,531 @@ td button {
     transition: none !important;
     scroll-behavior: auto !important;
   }
-  .portal:hover {
-    transform: none;
-  }
-}
-
-.hero-copy {
-  min-width: 0;
-}
-.hero-character {
-  mix-blend-mode: normal;
-}
-.hero-title {
-  background: linear-gradient(125deg, #becbe634, #f6b7cc14);
-}
-@media (max-width: 600px) {
-  .home-hero {
-    display: block;
-    min-height: 560px;
-  }
-  .hero-copy {
-    padding-top: 20px;
-  }
-  .hero-title {
-    width: 100%;
-  }
-  .hero-title h1 {
-    font-size: 48px;
-  }
-  .hero-verse {
-    width: auto;
-  }
-  .hero-character {
-    position: absolute;
-    height: 305px;
-    width: 184px;
-    right: 0;
-    top: 235px;
-    margin: 0;
-  }
-  .hero-character .character-halo {
-    width: 76%;
-  }
-  .hero-number {
-    bottom: 12px;
-  }
 }
 
 .sidebar-flower {
   padding: 3px 6px;
   border: 0;
   background: transparent;
+}
+
+.welcome {
+  min-height: 100svh;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.85fr) minmax(280px, 0.85fr);
+  grid-template-areas: 'title character poem' 'hint hint hint';
+  align-content: center;
+  align-items: center;
+  gap: 28px;
+  padding: 5vh 5vw;
+  cursor: pointer;
+  background:
+    radial-gradient(ellipse at 25% 50%, #bacce534, transparent 60%),
+    radial-gradient(ellipse at 68% 38%, #ffbcd632, transparent 55%);
+}
+.welcome-copy {
+  grid-area: title;
+  padding: 30px 26px 36px;
+  background: linear-gradient(135deg, #ffffff48, #ffffff18);
+  border-color: #ffffffa0;
+  z-index: 1;
+}
+.welcome h1 {
+  margin: 0;
+  font-family: Inter, 'Segoe UI', sans-serif;
+  font-size: clamp(72px, 8vw, 130px);
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: #65586e;
+}
+.welcome h1 > span {
+  display: block;
+  margin-top: 17px;
+  font-size: 0.36em;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+.welcome h1 br {
+  display: none;
+}
+.welcome-character {
+  grid-area: character;
+  position: relative;
+  height: min(72vh, 650px);
+  display: grid;
+  place-items: center;
+}
+.welcome-character img {
+  position: relative;
+  width: 120%;
+  max-width: 120%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 22px #ba9eac12);
+}
+.welcome-orbit {
+  position: absolute;
+  width: 120%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid #ffffff9c;
+  background: radial-gradient(circle, #ffffff28, #e2daf728);
+  transform: rotate(-20deg);
+}
+.welcome .gift-poem {
+  grid-area: poem;
+  margin: 0;
+  padding: 18px 0 18px 22px;
+  width: auto;
+}
+.welcome .gift-poem p {
+  font-size: 12px;
+  line-height: 2.3;
+}
+.start-hint {
+  grid-area: hint;
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+  color: #746776;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  animation: breathe 3.8s ease-in-out infinite;
+}
+.enter-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+}
+.enter-hint kbd {
+  font:
+    500 11px Inter,
+    'Segoe UI',
+    sans-serif;
+  letter-spacing: 0.04em;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ffffffba;
+  box-shadow: 0 2px 0 #baadc133;
+  background: #ffffff68;
+}
+.home-studio {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  grid-template-areas: 'heading character' 'poetry character';
+  column-gap: 45px;
+  position: relative;
+  padding: 8px 8px 45px;
+  margin-top: -10px;
+}
+.studio-heading {
+  grid-area: heading;
+  align-self: end;
+  padding: 22px 0 28px;
+}
+.studio-heading h1 {
+  font-size: 45px;
+  font-weight: 450;
+  letter-spacing: 0.06em;
+  margin: 0 0 17px;
+}
+.studio-heading h1 span {
+  font-size: 0.53em;
+  margin-left: 14px;
+  font-weight: 350;
+  color: #827887;
+}
+.studio-heading time {
+  font-size: 11px;
+  color: #898090;
+  letter-spacing: 0.1em;
+}
+.studio-character {
+  grid-area: character;
+  position: relative;
+  height: 510px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.studio-character img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  position: relative;
+}
+.studio-orbit {
+  position: absolute;
+  width: 105%;
+  aspect-ratio: 1;
+  border: 1px solid #ffffffb0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--mood-tint), transparent 70%);
+  opacity: 0.48;
+  transition: background 0.5s;
+}
+.studio-star {
+  position: absolute;
+  right: 2%;
+  top: 23%;
+  font-size: 30px;
+  color: #bba6be;
+}
+.studio-mark {
+  position: absolute;
+  right: 14px;
+  bottom: 17px;
+  font-size: 10px;
+  color: #a79bab;
+  letter-spacing: 0.2em;
+}
+.poetry-card {
+  grid-area: poetry;
+  align-self: start;
+  position: relative;
+  padding: 25px 30px;
+  background: linear-gradient(125deg, #ffffff7a, #ffffff22);
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.35s;
+}
+.poetry-card:before {
+  content: '';
+  position: absolute;
+  width: 34px;
+  height: 11px;
+  background: #d7cae244;
+  border: 1px solid #ffffff55;
+  top: -6px;
+  left: 32px;
+  transform: rotate(-7deg);
+}
+.poetry-card .eyebrow {
+  margin: 0;
+  font-size: 10px;
+}
+.poem-number {
+  font-size: 9px;
+  color: #a395a8;
+  letter-spacing: 0.14em;
+}
+.poetry-card blockquote {
+  margin: 30px 0;
+  font-family: 'Noto Serif SC', 'Songti SC', SimSun, serif;
+  font-size: clamp(20px, 2.3vw, 30px);
+  line-height: 1.7;
+  letter-spacing: 0.09em;
+  color: #696273;
+  animation: arrive 0.45s both;
+}
+.poetry-card blockquote p {
+  margin: 0;
+}
+.poem-credit {
+  font-size: 11px;
+  color: #8a7c90;
+  line-height: 1.7;
+}
+.poem-credit:hover {
+  text-decoration: underline;
+}
+.poem-next {
+  font-size: 10px;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+.moment {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 40px;
+  padding: 32px;
+  margin-top: 30px;
+}
+.moment-heading h2 {
+  font-size: 23px;
+  letter-spacing: 0.1em;
+}
+.moment-heading p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.moment-heading .eyebrow {
+  font-size: 8px;
+}
+.mood-orb {
+  width: 85px;
+  height: 85px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ffffffb0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 20%, #ffffff, var(--mood-tint));
+  box-shadow:
+    inset 0 -8px 18px #ffffff60,
+    0 8px 28px #a69caf12;
+  color: #8b8197;
+  margin-top: 24px;
+  transition: background 0.4s;
+}
+.moment-form {
+  min-width: 0;
+}
+.mood-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+.mood-options button {
+  font-size: 11px;
+  padding: 9px 12px;
+  color: #817587;
+}
+.mood-options button.selected {
+  border-color: #d6bdce;
+  background: #ffffffb5;
+  color: #725468;
+}
+.moment-form textarea {
+  min-height: 95px;
+  font-size: 13px;
+  background: #ffffff38;
+}
+.moment-actions {
+  margin-top: 12px;
+}
+.moment-actions button {
+  font-size: 11px;
+  padding: 9px 14px;
+}
+@media (max-width: 1100px) {
+  .welcome {
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 0.7fr) minmax(240px, 0.9fr);
+    padding-inline: 4vw;
+    gap: 18px;
+  }
+  .welcome-copy {
+    padding-inline: 19px;
+  }
+  .welcome h1 {
+    font-size: 84px;
+  }
+  .welcome .gift-poem {
+    padding-left: 15px;
+  }
+  .welcome .gift-poem p {
+    font-size: 11px;
+  }
+  .home-studio {
+    column-gap: 18px;
+  }
+  .studio-character {
+    height: 480px;
+  }
+  .poetry-card {
+    padding: 23px;
+  }
+  .poetry-card blockquote {
+    font-size: 23px;
+  }
+  .moment {
+    gap: 22px;
+    padding: 25px;
+  }
+}
+@media (max-width: 800px) {
+  .welcome {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+    grid-template-areas: 'title character' 'poem poem' 'hint hint';
+    padding: 35px 9vw;
+    gap: 20px;
+  }
+  .welcome-character {
+    height: 320px;
+  }
+  .welcome-character img {
+    width: 100%;
+    max-width: 100%;
+  }
+  .welcome .gift-poem {
+    margin: 0 auto;
+    max-width: 400px;
+  }
+  .welcome .gift-poem h2 {
+    margin-bottom: 12px;
+  }
+  .welcome .gift-poem cite {
+    margin-top: 12px;
+  }
+  .welcome .gift-poem p {
+    font-size: 12px;
+  }
+  .start-hint {
+    margin: 7px 0 0;
+  }
+  .studio-heading h1 {
+    font-size: 36px;
+  }
+  .poetry-card blockquote {
+    font-size: 21px;
+    letter-spacing: 0.04em;
+  }
+  .poetry-card .row:last-child {
+    flex-wrap: wrap;
+  }
+  .moment {
+    grid-template-columns: 1fr;
+  }
+  .moment-heading {
+    position: relative;
+    padding-right: 75px;
+  }
+  .mood-orb {
+    position: absolute;
+    right: 0;
+    top: 12px;
+    width: 64px;
+    height: 64px;
+    margin: 0;
+  }
+}
+@media (max-width: 600px) {
+  .welcome {
+    padding: 25px 24px;
+    gap: 18px 6px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+  }
+  .welcome-copy {
+    padding: 20px 13px;
+  }
+  .welcome h1 {
+    font-size: clamp(45px, 12vw, 70px);
+    letter-spacing: -0.04em;
+  }
+  .welcome h1 > span {
+    font-size: 0.36em;
+    margin-top: 12px;
+  }
+  .welcome-character {
+    height: 245px;
+  }
+  .welcome-orbit {
+    width: 105%;
+  }
+  .welcome .gift-poem {
+    padding: 12px 0 12px 17px;
+    margin: 0 0 0 7px;
+  }
+  .welcome .gift-poem p {
+    font-size: 11px;
+    line-height: 2.2;
+  }
+  .start-hint {
+    font-size: 10px;
+    gap: 10px;
+  }
+  .home-studio {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr);
+    grid-template-areas: 'heading character' 'poetry poetry';
+    gap: 20px 6px;
+    padding: 0 0 28px;
+  }
+  .studio-heading {
+    align-self: center;
+    padding: 0;
+  }
+  .studio-heading .eyebrow {
+    font-size: 8px;
+    line-height: 1.8;
+    letter-spacing: 0.12em;
+  }
+  .studio-heading h1 {
+    font-size: 32px;
+    margin-bottom: 15px;
+  }
+  .studio-heading h1 span {
+    display: block;
+    margin: 9px 0 0;
+    font-size: 19px;
+  }
+  .studio-heading time {
+    font-size: 10px;
+    line-height: 1.9;
+  }
+  .studio-character {
+    height: 265px;
+  }
+  .studio-star {
+    font-size: 20px;
+    right: 0;
+  }
+  .studio-orbit {
+    width: 95%;
+  }
+  .poetry-card {
+    padding: 23px;
+  }
+  .poetry-card blockquote {
+    font-size: 25px;
+    margin: 25px 0;
+  }
+  .studio-mark {
+    display: none;
+  }
+  .moment {
+    padding: 22px;
+    margin-top: 14px;
+    gap: 18px;
+  }
+  .moment-heading h2 {
+    font-size: 20px;
+  }
+  .moment-heading p {
+    margin-bottom: 0;
+  }
+  .mood-options {
+    gap: 6px;
+  }
+  .mood-options button {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+  .moment-actions .row {
+    gap: 7px;
+  }
+  .moment-actions button {
+    padding: 9px 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .poetry-card,
+  .poetry-card blockquote,
+  .start-hint {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}
+
+.welcome-character img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.welcome-orbit {
+  width: 100%;
+  transform: none;
 }

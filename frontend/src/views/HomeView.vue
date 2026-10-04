@@ -1,76 +1,163 @@
 <script setup lang="ts">
-import { Headphones, BookOpen, ArrowUpRight } from 'lucide-vue-next';
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { Shuffle, Sun, Cloud, CloudRain, Feather, Check, Trash2 } from 'lucide-vue-next';
 import { useAuth } from '../stores/auth';
 import { useUi } from '../stores/ui';
-import CharacterIcon from '../components/CharacterIcon.vue';
+import { poems, localDay } from '../data/poems';
 const auth = useAuth(),
   ui = useUi();
+const now = ref(new Date());
+const day = computed(() => localDay(now.value));
+const dateLabel = computed(() =>
+  new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
+  }).format(now.value),
+);
+const poemIndex = ref(
+  (now.value.getFullYear() * 372 + now.value.getMonth() * 31 + now.value.getDate()) % poems.length,
+);
+const poem = computed(() => poems[poemIndex.value]);
+const moods = [
+  { name: '晴朗', icon: Sun, color: '#f6e2bf' },
+  { name: '平静', icon: Cloud, color: '#d5e3f6' },
+  { name: '放空', icon: Feather, color: '#e7dcf5' },
+  { name: '微雨', icon: CloudRain, color: '#d8e9e7' },
+];
+const mood = ref('平静'),
+  note = ref(''),
+  saved = ref(false);
+const key = computed(() => `vibe-moment:${auth.user?.id ?? 'guest'}:${day.value}`);
+const tint = computed(() => moods.find((m) => m.name === mood.value)?.color || '#d5e3f6');
+watch(
+  key,
+  () => {
+    mood.value = '平静';
+    note.value = '';
+    saved.value = false;
+    try {
+      const raw = localStorage.getItem(key.value);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (typeof data?.text === 'string') note.value = data.text.slice(0, 140);
+      if (moods.some((m) => m.name === data?.mood)) mood.value = data.mood;
+      saved.value = true;
+    } catch {
+      ui.notify('无法读取本机留笺，你仍可在此书写。', true);
+    }
+  },
+  { immediate: true },
+);
+function save() {
+  try {
+    localStorage.setItem(
+      key.value,
+      JSON.stringify({ mood: mood.value, text: note.value.slice(0, 140) }),
+    );
+    saved.value = true;
+  } catch {
+    ui.notify('无法保存到当前浏览器，请检查存储空间或隐私设置。', true);
+  }
+}
+function clear() {
+  try {
+    localStorage.removeItem(key.value);
+    note.value = '';
+    mood.value = '平静';
+    saved.value = false;
+  } catch {
+    ui.notify('无法清除本机留笺。', true);
+  }
+}
+let clock: ReturnType<typeof setInterval>;
+onMounted(() => {
+  clock = setInterval(() => {
+    now.value = new Date();
+  }, 60000);
+});
+onBeforeUnmount(() => clearInterval(clock));
 </script>
 <template>
-  <section class="home-hero">
-    <div class="hero-copy">
-      <span class="eyebrow">春の音 · 随心记</span>
-      <div class="hero-title glass">
-        <h1>Vibe<br /><span>Random Notes</span></h1>
-      </div>
-      <p class="hero-verse">人闲桂花落，夜静春山空。</p>
-      <a
-        class="poetry-source"
-        href="https://zh.wikisource.org/zh-hans/鳥鳴澗"
-        target="_blank"
-        rel="noopener noreferrer"
-        >王维 ·《鸟鸣涧》</a
-      >
-      <div class="actions">
-        <RouterLink to="/music" class="cta glass">进入音乐 <ArrowUpRight :size="17" /></RouterLink
-        ><RouterLink to="/diary" class="text-link">浏览日记 <ArrowUpRight :size="15" /></RouterLink>
-      </div>
+  <section class="home-studio" :style="{ '--mood-tint': tint }">
+    <div class="studio-heading">
+      <span class="eyebrow">VIBE RANDOM NOTES / TODAY</span>
+      <h1>今日<span>的一隅</span></h1>
+      <time :datetime="day">{{ dateLabel }}</time>
     </div>
-    <div class="hero-character">
-      <div class="character-halo" aria-hidden="true"></div>
+    <div class="studio-character">
+      <div class="studio-orbit" aria-hidden="true"></div>
       <img
         src="/airi-cutout.png"
         alt="身穿水手服、手拿冰淇淋的爱理全身插画"
         fetchpriority="high"
-      /><span class="character-spark" aria-hidden="true">✧</span>
+      /><span aria-hidden="true" class="studio-star">✧</span>
     </div>
-    <span class="hero-number" aria-hidden="true">01 — SPRING</span>
+    <section v-tilt class="poetry-card glass" aria-label="今日诗签">
+      <div class="row">
+        <span class="eyebrow">今日诗签</span
+        ><span class="poem-number"
+          >{{ String(poemIndex + 1).padStart(2, '0') }} /
+          {{ String(poems.length).padStart(2, '0') }}</span
+        >
+      </div>
+      <blockquote :key="poem.author" aria-live="polite">
+        <p v-for="line in poem.lines" :key="line">{{ line }}</p>
+      </blockquote>
+      <div class="row">
+        <a :href="poem.source" target="_blank" rel="noopener noreferrer" class="poem-credit"
+          >{{ poem.author }} ·《{{ poem.title }}》</a
+        ><button class="poem-next" @click="poemIndex = (poemIndex + 1) % poems.length">
+          <Shuffle :size="14" />换一签
+        </button>
+      </div>
+    </section>
+    <span class="studio-mark" aria-hidden="true">{{ day.slice(5).replace('-', ' / ') }}</span>
   </section>
-  <section class="portal-section">
-    <div class="section-kicker"><span>音 乐 与 日 记</span><span>02 / EXPLORE</span></div>
-    <div class="portals">
-      <RouterLink v-tilt to="/music" class="portal glass music-portal"
-        ><div>
-          <span class="eyebrow">LISTEN</span>
-          <h2>听见 · 音乐</h2>
-          <p>独坐幽篁里，弹琴复长啸。</p>
-          <small>王维 ·《竹里馆》</small
-          ><span class="portal-link">进入音乐世界 <ArrowUpRight :size="18" /></span>
-        </div>
-        <div class="record-art">
-          <div class="record-label"><Headphones :size="32" /></div></div
-      ></RouterLink>
-      <RouterLink v-tilt to="/diary" class="portal glass diary-portal"
-        ><div>
-          <span class="eyebrow">REMEMBER</span>
-          <h2>随心 · 日记</h2>
-          <p>月出惊山鸟，时鸣春涧中。</p>
-          <small>王维 ·《鸟鸣涧》</small
-          ><span class="portal-link">翻开你的故事 <ArrowUpRight :size="18" /></span>
-        </div>
-        <div class="notebook-art"><BookOpen :size="40" /><span>日 記</span></div></RouterLink
-      >
+  <section class="moment glass" :style="{ '--mood-tint': tint }">
+    <div class="moment-heading">
+      <span class="eyebrow">A MOMENT / {{ day.slice(5).replace('-', '.') }}</span>
+      <h2>心情留笺</h2>
+      <p>只留在当前浏览器，不会发布为日记。</p>
+      <div class="mood-orb" aria-hidden="true">
+        <component :is="moods.find((m) => m.name === mood)?.icon" :size="36" :stroke-width="1" />
+      </div>
     </div>
-  </section>
-  <section class="home-profile glass">
-    <CharacterIcon />
-    <div>
-      <span class="eyebrow">MY SPACE</span>
-      <h2>{{ auth.user ? auth.user.nickname || auth.user.username : '我的空间' }}</h2>
-      <p class="muted">个人资料 · 收藏 · 私有日记</p>
-    </div>
-    <RouterLink v-if="auth.user" class="cta" to="/account"
-      >进入我的空间 <ArrowUpRight :size="16" /></RouterLink
-    ><button v-else @click="ui.authOpen = true">登录账号 <ArrowUpRight :size="16" /></button>
+    <form class="moment-form" @submit.prevent="save">
+      <div class="mood-options" role="group" aria-label="此刻的心情">
+        <button
+          v-for="m in moods"
+          :key="m.name"
+          type="button"
+          :aria-pressed="mood === m.name"
+          :class="{ selected: mood === m.name }"
+          @click="
+            mood = m.name;
+            saved = false;
+          "
+        >
+          <component :is="m.icon" :size="16" />{{ m.name }}
+        </button>
+      </div>
+      <textarea
+        v-model="note"
+        maxlength="140"
+        rows="3"
+        aria-label="今日留笺"
+        placeholder="记下此刻的一句话…"
+        @input="saved = false"
+      ></textarea>
+      <div class="row moment-actions">
+        <span class="tiny muted" role="status">{{
+          saved ? '已保存在本机' : `${note.length} / 140`
+        }}</span>
+        <div class="row">
+          <button type="button" aria-label="清除今日留笺" @click="clear">
+            <Trash2 :size="14" /></button
+          ><button class="primary" type="submit"><Check :size="14" />留在今天</button>
+        </div>
+      </div>
+    </form>
   </section>
 </template>

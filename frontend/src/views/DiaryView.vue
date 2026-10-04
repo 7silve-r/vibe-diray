@@ -88,7 +88,7 @@ load();
     <div>
       <span class="eyebrow">DIARY / 日記</span>
       <h1>随心 · 日记</h1>
-      <p>人闲桂花落，夜静春山空。<small>王维 ·《鸟鸣涧》</small></p>
+      <p>常记溪亭日暮，沉醉不知归路。<small>李清照 ·《如梦令》</small></p>
     </div>
     <button class="primary" @click="write">＋ 写日记</button>
   </header>
