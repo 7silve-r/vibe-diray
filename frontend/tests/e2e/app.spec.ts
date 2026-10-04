@@ -48,11 +48,17 @@ async function setup(page: Page, login = false) {
 test('welcome', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('button', { name: '点击任意处开始' })).toBeVisible();
-  await page.screenshot({ path: 'test-results/welcome-desktop.png' });
+  await expect(page.locator('.gift-poem p')).toHaveCount(9);
+  await expect(page.locator('.gift-poem')).toContainText('直起腰来，我望见蓝色的大海和帆影。');
+  await page.screenshot({ animations: 'disabled', path: 'test-results/welcome-desktop.png' });
   await page.keyboard.press('Tab');
   await page.keyboard.press('Enter');
   await expect(page.getByText('听见 · 音乐')).toBeVisible();
-  await page.screenshot({ path: 'test-results/home-desktop.png', fullPage: true });
+  await page.screenshot({
+    animations: 'disabled',
+    path: 'test-results/home-desktop.png',
+    fullPage: true,
+  });
   await page.getByRole('link', { name: /翻开你的故事/ }).click();
   await expect(page.getByRole('heading', { name: '随心 · 日记' })).toBeVisible();
 });
@@ -131,7 +137,11 @@ test('mobile', async ({ page }) => {
   await setup(page);
   await page.goto('/');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.screenshot({ path: 'test-results/mobile-home.png', fullPage: true });
+  await page.screenshot({
+    animations: 'disabled',
+    path: 'test-results/mobile-home.png',
+    fullPage: true,
+  });
   await page.getByRole('link', { name: /翻开你的故事/ }).click();
   await page.getByRole('button', { name: '＋ 写日记' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -174,4 +184,54 @@ test('admin upload', async ({ page }) => {
   await page.getByRole('button', { name: '删除', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '请确认' })).toBeVisible();
   await page.getByRole('button', { name: '取消', exact: true }).click();
+});
+
+test('sidebar and states', async ({ page }) => {
+  await setup(page);
+  await page.goto('/missing-page');
+  await expect(page.getByRole('heading', { name: '这个页面不存在' })).toBeVisible();
+  await expect(page.locator('.mood-lost')).toBeVisible();
+  await page.getByRole('link', { name: '返回主页', exact: true }).click();
+  await expect(page.locator('.hero-character img')).toBeVisible();
+  expect(
+    await page
+      .locator('.hero-character img')
+      .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0),
+  ).toBe(true);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('navigation', { name: '主导航' })).toBeHidden();
+  await page.getByRole('button', { name: '切换侧边导航' }).click();
+  await page.getByRole('link', { name: '日记', exact: true }).click();
+  await expect(page.getByRole('navigation', { name: '主导航' })).toBeHidden();
+  await expect(page.locator('.mood-empty')).toBeVisible();
+  for (const width of [320, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  }
+  await page.screenshot({
+    animations: 'disabled',
+    path: 'test-results/diary-empty.png',
+    fullPage: true,
+  });
+});
+
+test('poem mobile and motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto('/');
+  await expect(page.locator('.gift-poem p')).toHaveCount(9);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(
+    await page.locator('.start-hint').evaluate((el) => getComputedStyle(el).animationName),
+  ).toBe('none');
+  await page.screenshot({
+    animations: 'disabled',
+    path: 'test-results/welcome-mobile.png',
+    fullPage: true,
+  });
+  await page.getByRole('button', { name: '点击任意处开始' }).press('Enter');
+  await expect(page.locator('.hero-character img')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
