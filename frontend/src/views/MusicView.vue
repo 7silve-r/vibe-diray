@@ -137,13 +137,13 @@ ui.run(async () => {
     </div>
     <RouterLink v-if="id" to="/music"><button>返回音乐</button></RouterLink>
   </header>
-  <StatePanel v-if="error" mood="error" class="glass">
+  <StatePanel v-if="error" mood="error">
     <p role="alert">{{ error }}</p>
     <button @click="load">重新加载</button>
   </StatePanel>
   <StatePanel v-else-if="loading" mood="loading" text="正在加载音乐…" />
   <template v-else-if="detail"
-    ><section class="detail-hero glass panel">
+    ><section class="detail-hero panel">
       <SmartImage class="cover" :src="detail.coverUrl || detail.avatar" />
       <div class="detail-copy">
         <span class="eyebrow">{{
@@ -170,11 +170,11 @@ ui.run(async () => {
         </div>
       </div>
     </section>
-    <section v-if="kind === 'song'" class="panel glass">
+    <section v-if="kind === 'song'" class="panel">
       <h2>歌词</h2>
       <div class="lyric">{{ detail.lyric || '这首歌还没有歌词。让旋律替它说话。' }}</div>
     </section>
-    <section v-else class="panel glass">
+    <section v-else class="panel">
       <SongList :songs="detail.songs || []" @refresh="load" />
     </section>
     <Comments
@@ -227,7 +227,7 @@ ui.run(async () => {
         <option v-for="s in styles" :key="s.styleId">{{ s.name }}</option></select
       ><button>搜索</button>
     </form>
-    <section v-if="['songs', 'recommended', 'favorites'].includes(tab)" class="panel glass">
+    <section v-if="['songs', 'recommended', 'favorites'].includes(tab)" class="panel">
       <SongList :songs="rows" @refresh="load" />
     </section>
     <div v-else-if="rows.length" class="grid">
@@ -239,7 +239,7 @@ ui.run(async () => {
           (tab === 'artists' ? 'artist/' : 'playlist/') +
           (item.artistId || item.playlistId)
         "
-        class="card glass"
+        class="content-item"
         ><SmartImage class="cover" :src="item.avatar || item.coverUrl" />
         <h3>{{ item.artistName || item.title }}</h3>
         <span class="muted tiny"
@@ -247,15 +247,15 @@ ui.run(async () => {
         ></RouterLink
       >
     </div>
-    <StatePanel v-else class="glass" text="暂时没有找到内容，换个关键词试试吧。" />
-    <section v-if="tab === 'recommended' && recommendedLists.length" class="panel glass">
+    <StatePanel v-else text="暂时没有找到内容，换个关键词试试吧。" />
+    <section v-if="tab === 'recommended' && recommendedLists.length" class="panel">
       <h2>灵感歌单</h2>
       <div class="grid">
         <RouterLink
           v-for="item in recommendedLists"
           :key="item.playlistId"
           :to="'/music/playlist/' + item.playlistId"
-          class="card"
+          class="content-item"
           ><SmartImage class="cover" :src="item.coverUrl" />
           <h3>{{ item.title }}</h3></RouterLink
         >

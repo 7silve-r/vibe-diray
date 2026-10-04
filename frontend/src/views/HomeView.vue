@@ -94,7 +94,7 @@ onBeforeUnmount(() => clearInterval(clock));
         fetchpriority="high"
       /><span aria-hidden="true" class="studio-star">✧</span>
     </div>
-    <section v-tilt class="poetry-card glass" aria-label="今日诗签">
+    <section class="poetry-feature" aria-label="今日诗签">
       <div class="row">
         <span class="eyebrow">今日诗签</span
         ><span class="poem-number"
@@ -115,7 +115,7 @@ onBeforeUnmount(() => clearInterval(clock));
     </section>
     <span class="studio-mark" aria-hidden="true">{{ day.slice(5).replace('-', ' / ') }}</span>
   </section>
-  <section class="moment glass" :style="{ '--mood-tint': tint }">
+  <section class="moment" :style="{ '--mood-tint': tint }">
     <div class="moment-heading">
       <span class="eyebrow">A MOMENT / {{ day.slice(5).replace('-', '.') }}</span>
       <h2>心情留笺</h2>

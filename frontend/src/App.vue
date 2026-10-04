@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
   <template v-else>
     <a href="#main-content" class="skip-link">跳到正文</a>
     <button
-      class="menu-toggle glass"
+      class="menu-toggle"
       :aria-expanded="menuOpen"
       aria-controls="side-navigation"
       aria-label="切换侧边导航"
@@ -94,7 +94,7 @@ onBeforeUnmount(() => {
       aria-label="关闭侧边导航"
       @click="menuOpen = false"
     ></button>
-    <aside id="side-navigation" class="sidebar glass" :class="{ open: menuOpen }">
+    <aside id="side-navigation" class="sidebar" :class="{ open: menuOpen }">
       <RouterLink to="/" class="brand" aria-label="Vibe Random Notes 主页" @click="menuOpen = false"
         ><CharacterIcon /><span>Vibe<small>RANDOM NOTES</small></span></RouterLink
       >
@@ -134,13 +134,13 @@ onBeforeUnmount(() => {
       </div>
     </aside>
     <header class="account-bar">
-      <RouterLink v-if="auth.user" to="/account" class="account-pill glass"
+      <RouterLink v-if="auth.user" to="/account" class="account-pill"
         ><SmartImage v-if="auth.user.userPic" :src="auth.user.userPic" /><CharacterIcon
           v-else
         /><span class="truncate">{{ auth.user.nickname || auth.user.username }}</span
         ><span v-if="auth.admin" class="badge"><ShieldCheck :size="13" />管理员</span></RouterLink
       >
-      <button v-else class="account-pill glass" @click="ui.authOpen = true">
+      <button v-else class="account-pill" @click="ui.authOpen = true">
         <UserRound :size="17" />登录 / 注册
       </button>
     </header>

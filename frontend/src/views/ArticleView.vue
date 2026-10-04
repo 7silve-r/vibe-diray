@@ -56,11 +56,11 @@ watch(() => [route.fullPath, auth.user?.id], load, { immediate: true });
 <template>
   <div class="read-width">
     <RouterLink to="/diary" class="muted">← 返回日记</RouterLink>
-    <StatePanel v-if="error" mood="error" class="glass">
+    <StatePanel v-if="error" mood="error">
       <p role="alert">{{ error }}</p>
       <button @click="load">重试</button>
     </StatePanel>
-    <article v-else-if="article" class="panel glass" style="margin-top: 25px">
+    <article v-else-if="article" class="panel" style="margin-top: 25px">
       <span class="eyebrow"
         >{{ article.createTime?.slice(0, 10) }} / {{ article.state }} / {{ article.cateName }}</span
       >

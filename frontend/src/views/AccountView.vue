@@ -82,12 +82,12 @@ async function remove() {
       ><button class="primary">✧ 管理中心</button></RouterLink
     >
   </header>
-  <StatePanel v-if="!auth.user" class="glass">
+  <StatePanel v-if="!auth.user">
     <p>登录后可管理个人资料、收藏和日记。</p>
     <button @click="auth.require()">登录 / 注册</button>
   </StatePanel>
   <template v-else
-    ><div class="row panel glass">
+    ><div class="row panel">
       <div class="row">
         <SmartImage
           v-if="auth.user.userPic"
@@ -113,7 +113,7 @@ async function remove() {
       </button>
     </div>
     <div class="account-grid">
-      <section class="panel glass">
+      <section class="panel">
         <h2>个人资料</h2>
         <form class="form" @submit.prevent="profile">
           <label>昵称<input v-model="nickname" maxlength="100" /></label
@@ -128,7 +128,7 @@ async function remove() {
             @change="avatar"
         /></label>
       </section>
-      <section class="panel glass">
+      <section class="panel">
         <h2>修改密码</h2>
         <form class="form" @submit.prevent="password">
           <label
@@ -156,7 +156,7 @@ async function remove() {
           ><button :disabled="busy">更新密码</button>
         </form>
       </section>
-      <section class="panel glass">
+      <section class="panel">
         <h2>给我们捎句话</h2>
         <form
           class="form"
@@ -177,7 +177,7 @@ async function remove() {
           ><button :disabled="busy">发送反馈</button>
         </form>
       </section>
-      <section class="panel glass">
+      <section class="panel">
         <h2>账号设置</h2>
         <p class="muted">邮箱状态：{{ auth.user.emailVerified ? '已验证' : '未验证' }}</p>
         <template v-if="mail"
