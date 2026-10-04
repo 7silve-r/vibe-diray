@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import StatePanel from '../components/StatePanel.vue';
 import { ref, watch, onBeforeUnmount, computed } from 'vue';
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
 import { api } from '../api';
@@ -126,19 +127,19 @@ watch(() => [auth.user?.id, route.params.id], init, { immediate: true });
 <template>
   <header class="section-head">
     <div>
-      <span class="eyebrow">DEAR, TODAY.</span>
+      <span class="eyebrow">WRITE / 书写</span>
       <h1>{{ route.params.id ? '续写这一页' : '写下此刻' }}</h1>
       <p>{{ saved || '支持 Markdown · 标题、列表、引用、代码和表格' }}</p>
     </div>
     <RouterLink to="/diary"><button>返回日记</button></RouterLink>
   </header>
-  <div v-if="!auth.user" class="empty glass">
+  <StatePanel v-if="!auth.user" class="glass">
     <button class="primary" @click="auth.require()">登录后开始记录</button>
-  </div>
-  <div v-else-if="error" class="empty glass">
+  </StatePanel>
+  <StatePanel v-else-if="error" mood="error" class="glass">
     <p>{{ error }}</p>
     <button @click="init">重新加载</button>
-  </div>
+  </StatePanel>
   <form v-else-if="ready" class="panel glass form" @submit.prevent="save">
     <div v-if="draft" class="row wrap">
       <span>发现这篇日记的本机草稿。</span><button type="button" @click="restore">恢复草稿</button

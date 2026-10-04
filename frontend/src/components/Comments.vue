@@ -4,6 +4,7 @@ import { api, query } from '../api';
 import { useAuth } from '../stores/auth';
 import { useUi } from '../stores/ui';
 import Pager from './Pager.vue';
+import CharacterIcon from './CharacterIcon.vue';
 const props = defineProps<{ kind: 'article' | 'song' | 'playlist'; id: number; items?: any[] }>();
 const emit = defineEmits(['refresh']);
 const auth = useAuth(),
@@ -81,7 +82,7 @@ async function remove(row: any) {
 </script>
 <template>
   <section class="panel glass">
-    <h2>留一点回声</h2>
+    <h2 class="comment-heading"><CharacterIcon />评论</h2>
     <form @submit.prevent="send">
       <textarea
         v-model="text"

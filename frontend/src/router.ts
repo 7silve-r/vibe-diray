@@ -10,6 +10,6 @@ export default createRouter({
     { path: '/diary/:id', component: () => import('./views/ArticleView.vue') },
     { path: '/account', component: () => import('./views/AccountView.vue') },
     { path: '/admin', component: () => import('./views/AdminView.vue') },
-    { path: '/:pathMatch(.*)*', redirect: '/' },
+    { path: '/:pathMatch(.*)*', component: () => import('./views/NotFoundView.vue') },
   ],
 });
