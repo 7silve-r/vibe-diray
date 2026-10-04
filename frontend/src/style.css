@@ -372,17 +372,6 @@ img {
   letter-spacing: 0.12em;
   margin-top: 25px;
 }
-.start-hint {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 8%;
-  text-align: center;
-  letter-spacing: 0.3em;
-  font-size: 12px;
-  color: #777281;
-  animation: breathe 3.8s ease-in-out infinite;
-}
 .cta {
   font-size: 12px;
 }
@@ -1142,9 +1131,6 @@ td button {
   .gift-poem cite {
     margin-top: 12px;
   }
-  .start-hint {
-    bottom: 30px;
-  }
 }
 @media (max-width: 600px) {
   .sidebar {
@@ -1294,10 +1280,6 @@ td button {
   .gift-poem h2 {
     font-size: 14px;
   }
-  .start-hint {
-    font-size: 10px;
-    bottom: 26px;
-  }
   .modal {
     padding: 24px;
   }
@@ -1335,30 +1317,72 @@ td button {
 }
 .welcome-copy {
   grid-area: title;
-  padding: 30px 26px 36px;
-  background: linear-gradient(135deg, #ffffff48, #ffffff18);
-  border-color: #ffffffa0;
-  z-index: 1;
+  position: relative;
+  min-width: 0;
+  padding: 24px 0;
+  container-type: inline-size;
 }
-.welcome h1 {
+.glass-wordmark {
   margin: 0;
+  padding: 0.08em 0.02em 0.12em;
   font-family: Inter, 'Segoe UI', sans-serif;
-  font-size: clamp(72px, 8vw, 130px);
-  font-weight: 650;
-  line-height: 1;
-  letter-spacing: -0.06em;
-  color: #65586e;
+  font-size: clamp(54px, 43cqw, 210px);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: -0.065em;
 }
-.welcome h1 > span {
+.glass-wordmark span {
   display: block;
-  margin-top: 17px;
-  font-size: 0.36em;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  width: fit-content;
+  color: #d6c9db;
+  background: linear-gradient(
+    155deg,
+    #ffffffd9 4%,
+    #ffffff24 28%,
+    #b8a7c679 45%,
+    #ffffffed 50%,
+    #ffffff26 69%,
+    #b7a2ba80 96%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0.65px #ffffffbc;
+  filter: drop-shadow(1px 2px 1px #88739938) drop-shadow(0 12px 16px #9e8bab15);
 }
-.welcome h1 br {
-  display: none;
+.glass-wordmark .word-vibe {
+  transform: rotate(-4deg);
+}
+.glass-wordmark .word-random {
+  margin: 0.2em 0 0.08em 16%;
+  font-size: 0.43em;
+  font-weight: 550;
+  letter-spacing: -0.045em;
+  transform: rotate(1deg);
+}
+.glass-wordmark .word-notes {
+  margin-left: 5%;
+  font-size: 0.72em;
+  font-weight: 650;
+  letter-spacing: -0.055em;
+  transform: rotate(-3deg);
+}
+@media (max-width: 600px) {
+  .glass-wordmark {
+    font-size: 43cqw;
+  }
+  .glass-wordmark span {
+    -webkit-text-stroke-width: 0.45px;
+  }
+}
+@media (forced-colors: active) {
+  .glass-wordmark span {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+    -webkit-text-stroke: 0;
+    filter: none;
+  }
 }
 .welcome-character {
   grid-area: character;
@@ -1389,42 +1413,61 @@ td button {
   margin: 0;
   padding: 18px 0 18px 22px;
   width: auto;
+  color: #807183;
 }
 .welcome .gift-poem p {
   font-size: 12px;
   line-height: 2.3;
 }
+.welcome .gift-poem h2 {
+  color: #9b8295;
+}
+.welcome .gift-poem cite {
+  color: #928295;
+}
 .start-hint {
   grid-area: hint;
   position: static;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 16px;
+  gap: 9px;
   margin-top: 14px;
-  color: #746776;
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  animation: breathe 3.8s ease-in-out infinite;
+  color: #917d90;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  animation: invitation 4.8s ease-in-out infinite;
+}
+.start-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.start-label::before,
+.start-label::after {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #bd9faf70);
+}
+.start-label::after {
+  transform: rotate(180deg);
 }
 .enter-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 10px;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  color: #9c8b9d;
 }
-.enter-hint kbd {
-  font:
-    500 11px Inter,
-    'Segoe UI',
-    sans-serif;
-  letter-spacing: 0.04em;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid #ffffffba;
-  box-shadow: 0 2px 0 #baadc133;
-  background: #ffffff68;
+@keyframes invitation {
+  0%,
+  100% {
+    opacity: 0.48;
+  }
+  50% {
+    opacity: 0.95;
+  }
 }
 .home-studio {
   display: grid;
@@ -1621,12 +1664,6 @@ td button {
     padding-inline: 4vw;
     gap: 18px;
   }
-  .welcome-copy {
-    padding-inline: 19px;
-  }
-  .welcome h1 {
-    font-size: 84px;
-  }
   .welcome .gift-poem {
     padding-left: 15px;
   }
@@ -1677,9 +1714,6 @@ td button {
   .welcome .gift-poem p {
     font-size: 12px;
   }
-  .start-hint {
-    margin: 7px 0 0;
-  }
   .studio-heading h1 {
     font-size: 36px;
   }
@@ -1712,17 +1746,6 @@ td button {
     gap: 18px 6px;
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
   }
-  .welcome-copy {
-    padding: 20px 13px;
-  }
-  .welcome h1 {
-    font-size: clamp(45px, 12vw, 70px);
-    letter-spacing: -0.04em;
-  }
-  .welcome h1 > span {
-    font-size: 0.36em;
-    margin-top: 12px;
-  }
   .welcome-character {
     height: 245px;
   }
@@ -1736,10 +1759,6 @@ td button {
   .welcome .gift-poem p {
     font-size: 11px;
     line-height: 2.2;
-  }
-  .start-hint {
-    font-size: 10px;
-    gap: 10px;
   }
   .home-studio {
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr);

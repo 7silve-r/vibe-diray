@@ -60,8 +60,12 @@ onBeforeUnmount(() => {
     aria-label="点击任意处开始"
     @click="enter"
   >
-    <div class="welcome-copy glass">
-      <h1>Vibe<br /><span>Random Notes</span></h1>
+    <div class="welcome-copy">
+      <h1 class="glass-wordmark" aria-label="Vibe Random Notes">
+        <span class="word-vibe" aria-hidden="true">Vibe</span>
+        <span class="word-random" aria-hidden="true">Random</span>
+        <span class="word-notes" aria-hidden="true">Notes</span>
+      </h1>
     </div>
     <div class="welcome-character">
       <div class="welcome-orbit" aria-hidden="true"></div>
@@ -69,7 +73,8 @@ onBeforeUnmount(() => {
     </div>
     <GiftPoem />
     <span class="start-hint"
-      >点击任意处开始<span class="enter-hint">或按 <kbd>Enter ↵</kbd></span></span
+      ><span class="start-label">点击任意处开始</span
+      ><span class="enter-hint">Enter to begin</span></span
     >
   </div>
   <template v-else>
