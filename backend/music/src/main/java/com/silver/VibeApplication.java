@@ -1,4 +1,4 @@
-package com.silver.music;
+package com.silver;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages = "com.silver")
 @MapperScan("com.silver.music.mapper")
-public class MusicApplication {
+public class VibeApplication {
     public static void main(String[] args) {
-        SpringApplication.run(MusicApplication.class, args);
+        SpringApplication.run(VibeApplication.class, args);
     }
 }

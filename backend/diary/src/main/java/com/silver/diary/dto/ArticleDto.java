@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 @Data
-public class ArticlePublishDto {
+public class ArticleDto {
     private String title;
     private Integer cateId;
     private String content;

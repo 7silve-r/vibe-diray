@@ -1,84 +1,71 @@
 package com.silver.music.service.impl;
 
-import org.springframework.transaction.annotation.Transactional;
-
-import com.silver.diary.exception.BusinessException;
-
-import com.silver.music.constant.JwtClaimsConstant;
-import com.silver.music.constant.MessageConstant;
-import com.silver.music.enumeration.LikeStatusEnum;
-import com.silver.music.mapper.PlaylistMapper;
-import com.silver.music.mapper.SongMapper;
-import com.silver.music.mapper.UserFavoriteMapper;
-import com.silver.music.dto.PlaylistDto;
-import com.silver.music.dto.SongDto;
-import com.silver.music.entity.Playlist;
-import com.silver.music.entity.UserFavorite;
-import com.silver.music.vo.PlaylistVO;
-import com.silver.music.vo.SongVO;
-import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
-import com.silver.music.service.UserFavoriteService;
-import com.silver.music.utils.CurrentUserUtil;
-import com.silver.music.utils.TypeConversionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.silver.diary.common.PageResult;
+import com.silver.diary.common.Result;
+import com.silver.diary.exception.BusinessException;
+import com.silver.diary.utils.SecurityUtil;
+import com.silver.music.constant.MessageConstant;
+import com.silver.music.dto.PlaylistQueryDto;
+import com.silver.music.dto.SongQueryDto;
+import com.silver.music.entity.UserFavorite;
+import com.silver.music.enumeration.FavoriteStatus;
+import com.silver.music.mapper.PlaylistMapper;
+import com.silver.music.mapper.SongMapper;
+import com.silver.music.mapper.UserFavoriteMapper;
+import com.silver.music.service.UserFavoriteService;
+import com.silver.music.vo.PlaylistVo;
+import com.silver.music.vo.SongVo;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+public class UserFavoriteServiceImpl extends ServiceImpl<UserFavoriteMapper, UserFavorite>
+        implements UserFavoriteService {
 
-public class UserFavoriteServiceImpl extends ServiceImpl<UserFavoriteMapper, UserFavorite> implements UserFavoriteService {
-
-    @Autowired
-    private UserFavoriteMapper userFavoriteMapper;
-    @Autowired
-    private SongMapper songMapper;
-    @Autowired
-    private PlaylistMapper playlistMapper;
+    @Autowired private UserFavoriteMapper userFavoriteMapper;
+    @Autowired private SongMapper songMapper;
+    @Autowired private PlaylistMapper playlistMapper;
 
     @Override
-    public Result<PageResult<SongVO>> getUserFavoriteSongs(SongDto songDto) {
-        Map<String, Object> map = CurrentUserUtil.get();
-        Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-        Long userId = TypeConversionUtil.toLong(userIdObj);
+    public Result<PageResult<SongVo>> getUserFavoriteSongs(SongQueryDto songDto) {
+        Long userId = SecurityUtil.userId().longValue();
 
         List<Long> favoriteSongIds = userFavoriteMapper.getUserFavoriteSongIds(userId);
         if (favoriteSongIds.isEmpty()) {
             return Result.success(new PageResult<>(0L, Collections.emptyList()));
         }
 
-        Page<SongVO> page = new Page<>(songDto.getPageNum(), songDto.getPageSize());
-        IPage<SongVO> songPage = songMapper.getSongsByIds(userId,
-                page,
-                favoriteSongIds,
-                songDto.getSongName(),
-                songDto.getArtistName(),
-                songDto.getAlbum()
-        );
+        Page<SongVo> page = new Page<>(songDto.getPageNum(), songDto.getPageSize());
+        IPage<SongVo> songPage =
+                songMapper.getSongsByIds(
+                        userId,
+                        page,
+                        favoriteSongIds,
+                        songDto.getSongName(),
+                        songDto.getArtistName(),
+                        songDto.getAlbum());
 
-        List<SongVO> songVOList = songPage.getRecords().stream()
-                .peek(songVO -> songVO.setLikeStatus(LikeStatusEnum.LIKE.getId()))
-                .toList();
+        List<SongVo> songVoList =
+                songPage.getRecords().stream()
+                        .peek(songVo -> songVo.setFavoriteStatus(FavoriteStatus.SAVED.getId()))
+                        .toList();
 
-        return Result.success(new PageResult<>(songPage.getTotal(), songVOList));
+        return Result.success(new PageResult<>(songPage.getTotal(), songVoList));
     }
 
     @Override
     @Transactional
     public Result<Void> collectSong(Long songId) {
         if (songMapper.lock(songId) == null) throw new BusinessException(404, "歌曲不存在");
-        Map<String, Object> map = CurrentUserUtil.get();
-        Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-        Long userId = TypeConversionUtil.toLong(userIdObj);
+        Long userId = SecurityUtil.userId().longValue();
 
         QueryWrapper<UserFavorite> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId).eq("type", 0).eq("song_id", songId);
@@ -98,9 +85,7 @@ public class UserFavoriteServiceImpl extends ServiceImpl<UserFavoriteMapper, Use
 
     @Override
     public Result<Void> cancelCollectSong(Long songId) {
-        Map<String, Object> map = CurrentUserUtil.get();
-        Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-        Long userId = TypeConversionUtil.toLong(userIdObj);
+        Long userId = SecurityUtil.userId().longValue();
 
         QueryWrapper<UserFavorite> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId).eq("type", 0).eq("song_id", songId);
@@ -110,24 +95,22 @@ public class UserFavoriteServiceImpl extends ServiceImpl<UserFavoriteMapper, Use
     }
 
     @Override
-    public Result<PageResult<PlaylistVO>> getUserFavoritePlaylists(PlaylistDto playlistDto) {
-        Map<String, Object> map = CurrentUserUtil.get();
-        Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-        Long userId = TypeConversionUtil.toLong(userIdObj);
+    public Result<PageResult<PlaylistVo>> getUserFavoritePlaylists(PlaylistQueryDto playlistDto) {
+        Long userId = SecurityUtil.userId().longValue();
 
         List<Long> favoritePlaylistIds = userFavoriteMapper.getUserFavoritePlaylistIds(userId);
         if (favoritePlaylistIds.isEmpty()) {
             return Result.success(new PageResult<>(0L, Collections.emptyList()));
         }
 
-        Page<PlaylistVO> page = new Page<>(playlistDto.getPageNum(), playlistDto.getPageSize());
-        IPage<PlaylistVO> playlistPage = playlistMapper.getPlaylistsByIds(
-                userId,
-                page,
-                favoritePlaylistIds,
-                playlistDto.getTitle(),
-                playlistDto.getStyle()
-        );
+        Page<PlaylistVo> page = new Page<>(playlistDto.getPageNum(), playlistDto.getPageSize());
+        IPage<PlaylistVo> playlistPage =
+                playlistMapper.getPlaylistsByIds(
+                        userId,
+                        page,
+                        favoritePlaylistIds,
+                        playlistDto.getTitle(),
+                        playlistDto.getStyle());
 
         return Result.success(new PageResult<>(playlistPage.getTotal(), playlistPage.getRecords()));
     }
@@ -136,9 +119,7 @@ public class UserFavoriteServiceImpl extends ServiceImpl<UserFavoriteMapper, Use
     @Transactional
     public Result<Void> collectPlaylist(Long playlistId) {
         if (playlistMapper.lock(playlistId) == null) throw new BusinessException(404, "歌单不存在");
-        Map<String, Object> map = CurrentUserUtil.get();
-        Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-        Long userId = TypeConversionUtil.toLong(userIdObj);
+        Long userId = SecurityUtil.userId().longValue();
 
         QueryWrapper<UserFavorite> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId).eq("type", 1).eq("playlist_id", playlistId);
@@ -158,9 +139,7 @@ public class UserFavoriteServiceImpl extends ServiceImpl<UserFavoriteMapper, Use
 
     @Override
     public Result<Void> cancelCollectPlaylist(Long playlistId) {
-        Map<String, Object> map = CurrentUserUtil.get();
-        Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-        Long userId = TypeConversionUtil.toLong(userIdObj);
+        Long userId = SecurityUtil.userId().longValue();
 
         QueryWrapper<UserFavorite> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId).eq("type", 1).eq("playlist_id", playlistId);
@@ -168,5 +147,4 @@ public class UserFavoriteServiceImpl extends ServiceImpl<UserFavoriteMapper, Use
 
         return Result.success(MessageConstant.DELETE + MessageConstant.SUCCESS, null);
     }
-
 }

@@ -1,18 +1,16 @@
 package com.silver.music.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Data;
 
 @Data
-public class ArtistDetailVO implements Serializable {
+public class ArtistDetailVo implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private Long artistId;
 
@@ -29,6 +27,5 @@ public class ArtistDetailVO implements Serializable {
 
     private String introduction;
 
-    private List<SongVO> songs;
-
+    private List<SongVo> songs;
 }

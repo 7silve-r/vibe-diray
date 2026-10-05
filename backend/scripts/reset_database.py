@@ -24,17 +24,17 @@ if env_file.exists():
             raise SystemExit(".env 格式错误，请使用 NAME=value")
         env[key] = value.strip().strip("\"'")
 
-url = env.get("DIARY_DB_URL", "")
+url = env.get("DB_URL", "")
 if not url.startswith("jdbc:mysql://"):
-    raise SystemExit("请在 .env 或环境变量中明确设置 DIARY_DB_URL，工具不会猜测数据库。")
+    raise SystemExit("请在 .env 或环境变量中明确设置 DB_URL，工具不会猜测数据库。")
 target = urlparse(url[5:])
 database = target.path.lstrip("/")
 if target.hostname not in ("localhost", "127.0.0.1", "::1"):
     raise SystemExit("只允许连接本机 MySQL。")
 if database != args.database or not re.fullmatch(r"[a-zA-Z0-9_]+", database):
-    raise SystemExit("--database 必须与 DIARY_DB_URL 中的库名完全一致。")
-if not env.get("DIARY_DB_PASSWORD"):
-    raise SystemExit("缺少 DIARY_DB_PASSWORD。")
+    raise SystemExit("--database 必须与 DB_URL 中的库名完全一致。")
+if not env.get("DB_PASSWORD"):
+    raise SystemExit("缺少 DB_PASSWORD。")
 mysql = shutil.which("mysql")
 if not mysql and env.get("MYSQL_HOME"):
     candidate = Path(env["MYSQL_HOME"]) / "bin/mysql.exe"
@@ -42,9 +42,9 @@ if not mysql and env.get("MYSQL_HOME"):
 if not mysql:
     raise SystemExit("找不到 mysql 客户端，请将 MySQL 的 bin 目录加入 PATH。")
 process_env = dict(os.environ)
-process_env["MYSQL_PWD"] = env["DIARY_DB_PASSWORD"]
+process_env["MYSQL_PWD"] = env["DB_PASSWORD"]
 command = [mysql, "--protocol=TCP", "--host=" + target.hostname,
-           "--port=" + str(target.port or 3306), "--user=" + env.get("DIARY_DB_USER", "root"),
+           "--port=" + str(target.port or 3306), "--user=" + env.get("DB_USER", "root"),
            "--default-character-set=utf8mb4", "--batch", "--skip-column-names", "--database=" + database]
 def run(sql):
     result = subprocess.run(command, input=sql, text=True, encoding="utf-8", env=process_env,

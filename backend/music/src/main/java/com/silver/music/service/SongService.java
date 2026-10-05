@@ -1,31 +1,29 @@
 package com.silver.music.service;
 
-import com.silver.music.dto.SongAddDto;
-import com.silver.music.dto.SongAndArtistDto;
-import com.silver.music.dto.SongDto;
-import com.silver.music.dto.SongUpdateDto;
-import com.silver.music.entity.Song;
-import com.silver.music.vo.SongAdminVO;
-import com.silver.music.vo.SongDetailVO;
-import com.silver.music.vo.SongVO;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.silver.diary.common.PageResult;
 import com.silver.diary.common.Result;
-import com.baomidou.mybatisplus.spring.service.IService;
-import jakarta.servlet.http.HttpServletRequest;
-
+import com.silver.music.dto.AdminSongQueryDto;
+import com.silver.music.dto.SongAddDto;
+import com.silver.music.dto.SongQueryDto;
+import com.silver.music.dto.SongUpdateDto;
+import com.silver.music.entity.Song;
+import com.silver.music.vo.SongAdminVo;
+import com.silver.music.vo.SongDetailVo;
+import com.silver.music.vo.SongVo;
 import java.util.List;
 
 public interface SongService extends IService<Song> {
 
-    Result<PageResult<SongVO>> getAllSongs(SongDto songDto, HttpServletRequest request);
+    Result<PageResult<SongVo>> listSongs(SongQueryDto songDto);
 
-    Result<PageResult<SongAdminVO>> getAllSongsByArtist(SongAndArtistDto songDto);
+    Result<PageResult<SongAdminVo>> listAdminSongs(AdminSongQueryDto songDto);
 
-    Result<List<SongVO>> getRecommendedSongs(HttpServletRequest request);
+    Result<List<SongVo>> getRecommendedSongs();
 
-    Result<SongDetailVO> getSongDetail(Long songId, HttpServletRequest request);
+    Result<SongDetailVo> getSongDetail(Long songId);
 
-    Result<Long> getAllSongsCount(String style);
+    Result<Long> countSongs(String style);
 
     Result<Void> addSong(SongAddDto songAddDto);
 
@@ -38,5 +36,4 @@ public interface SongService extends IService<Song> {
     Result<Void> deleteSong(Long songId);
 
     Result<Void> deleteSongs(List<Long> songIds);
-
 }

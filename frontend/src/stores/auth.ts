@@ -7,7 +7,7 @@ export const useAuth = defineStore('auth', () => {
   const ready = ref(false);
   const admin = computed(() => user.value?.role === 'ADMIN');
   async function refresh() {
-    user.value = await api('/my/userinfo');
+    user.value = await api('/my/profile');
   }
   function clear() {
     sessionStorage.removeItem('vibe-token');

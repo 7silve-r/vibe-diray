@@ -9,30 +9,31 @@ import com.silver.music.dto.*;
 import com.silver.music.entity.*;
 import com.silver.music.mapper.*;
 import com.silver.music.service.CommentService;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Service
-public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
-    @Autowired
-    private CommentMapper commentMapper;
-    @Autowired
-    private CommentLikeMapper likeMapper;
-    @Autowired
-    private SongMapper songMapper;
-    @Autowired
-    private PlaylistMapper playlistMapper;
+public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment>
+        implements CommentService {
+    @Autowired private CommentMapper commentMapper;
+    @Autowired private CommentLikeMapper likeMapper;
+    @Autowired private SongMapper songMapper;
+    @Autowired private PlaylistMapper playlistMapper;
 
     private Result<Void> add(Long songId, Long playlistId, String content) {
-        if (content == null || content.isBlank() || content.length() > 255) throw new BusinessException("评论须为1到255字");
+        if (content == null || content.isBlank() || content.length() > 255)
+            throw new BusinessException("评论须为1到255字");
         Comment comment = new Comment();
         comment.setUserId(SecurityUtil.userId().longValue());
-        comment.setSongId(songId); comment.setPlaylistId(playlistId);
-        comment.setType(songId != null ? 0 : 1); comment.setContent(content);
-        comment.setCreateTime(LocalDateTime.now()); comment.setLikeCount(0L);
+        comment.setSongId(songId);
+        comment.setPlaylistId(playlistId);
+        comment.setType(songId != null ? 0 : 1);
+        comment.setContent(content);
+        comment.setCreateTime(LocalDateTime.now());
+        comment.setLikeCount(0L);
         commentMapper.insert(comment);
         return Result.success();
     }
@@ -40,14 +41,16 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     @Transactional
     public Result<Void> addSongComment(CommentSongDto dto) {
-        if (dto.getSongId() == null || songMapper.lock(dto.getSongId()) == null) throw new BusinessException(404, "歌曲不存在");
+        if (dto.getSongId() == null || songMapper.lock(dto.getSongId()) == null)
+            throw new BusinessException(404, "歌曲不存在");
         return add(dto.getSongId(), null, dto.getContent());
     }
 
     @Override
     @Transactional
     public Result<Void> addPlaylistComment(CommentPlaylistDto dto) {
-        if (dto.getPlaylistId() == null || playlistMapper.lock(dto.getPlaylistId()) == null) throw new BusinessException(404, "歌单不存在");
+        if (dto.getPlaylistId() == null || playlistMapper.lock(dto.getPlaylistId()) == null)
+            throw new BusinessException(404, "歌单不存在");
         return add(null, dto.getPlaylistId(), dto.getContent());
     }
 
@@ -59,30 +62,42 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     private Result<Void> like(Long id, boolean cancel) {
         Comment comment = comment(id);
-        var query = new LambdaQueryWrapper<CommentLike>().eq(CommentLike::getCommentId, id)
-                .eq(CommentLike::getUserId, SecurityUtil.userId());
+        var query =
+                new LambdaQueryWrapper<CommentLike>()
+                        .eq(CommentLike::getCommentId, id)
+                        .eq(CommentLike::getUserId, SecurityUtil.userId());
         if (cancel) likeMapper.delete(query);
         else if (!likeMapper.exists(query)) {
-            CommentLike like = new CommentLike(); like.setCommentId(id); like.setUserId(SecurityUtil.userId()); likeMapper.insert(like);
+            CommentLike like = new CommentLike();
+            like.setCommentId(id);
+            like.setUserId(SecurityUtil.userId());
+            likeMapper.insert(like);
         }
-        comment.setLikeCount(likeMapper.selectCount(new LambdaQueryWrapper<CommentLike>().eq(CommentLike::getCommentId, id)));
+        comment.setLikeCount(
+                likeMapper.selectCount(
+                        new LambdaQueryWrapper<CommentLike>().eq(CommentLike::getCommentId, id)));
         commentMapper.updateById(comment);
         return Result.success();
     }
 
     @Override
     @Transactional
-    public Result<Void> likeComment(Long id) { return like(id, false); }
+    public Result<Void> likeComment(Long id) {
+        return like(id, false);
+    }
 
     @Override
     @Transactional
-    public Result<Void> cancelLikeComment(Long id) { return like(id, true); }
+    public Result<Void> cancelLikeComment(Long id) {
+        return like(id, true);
+    }
 
     @Override
     @Transactional
     public Result<Void> deleteComment(Long id) {
         Comment comment = comment(id);
-        if (!Objects.equals(comment.getUserId(), SecurityUtil.userId().longValue()) && !SecurityUtil.isAdmin()) {
+        if (!Objects.equals(comment.getUserId(), SecurityUtil.userId().longValue())
+                && !SecurityUtil.isAdmin()) {
             throw new BusinessException(403, "只能删除自己的评论");
         }
         commentMapper.deleteById(id);

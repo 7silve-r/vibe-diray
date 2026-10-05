@@ -1,29 +1,27 @@
 package com.silver.music.service;
 
-import com.silver.music.dto.PlaylistAddDto;
-import com.silver.music.dto.PlaylistDto;
-import com.silver.music.dto.PlaylistUpdateDto;
-import com.silver.music.entity.Playlist;
-import com.silver.music.vo.PlaylistDetailVO;
-import com.silver.music.vo.PlaylistVO;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.silver.diary.common.PageResult;
 import com.silver.diary.common.Result;
-import com.baomidou.mybatisplus.spring.service.IService;
-import jakarta.servlet.http.HttpServletRequest;
-
+import com.silver.music.dto.PlaylistAddDto;
+import com.silver.music.dto.PlaylistQueryDto;
+import com.silver.music.dto.PlaylistUpdateDto;
+import com.silver.music.entity.Playlist;
+import com.silver.music.vo.PlaylistDetailVo;
+import com.silver.music.vo.PlaylistVo;
 import java.util.List;
 
 public interface PlaylistService extends IService<Playlist> {
 
-    Result<PageResult<PlaylistVO>> getAllPlaylists(PlaylistDto playlistDto);
+    Result<PageResult<PlaylistVo>> listPlaylists(PlaylistQueryDto playlistDto);
 
-    Result<PageResult<Playlist>> getAllPlaylistsInfo(PlaylistDto playlistDto);
+    Result<PageResult<Playlist>> listAdminPlaylists(PlaylistQueryDto playlistDto);
 
-    Result<List<PlaylistVO>> getRecommendedPlaylists(HttpServletRequest request);
+    Result<List<PlaylistVo>> getRecommendedPlaylists();
 
-    Result<PlaylistDetailVO> getPlaylistDetail(Long playlistId, HttpServletRequest request);
+    Result<PlaylistDetailVo> getPlaylistDetail(Long playlistId);
 
-    Result<Long> getAllPlaylistsCount(String style);
+    Result<Long> countPlaylists(String style);
 
     Result<Void> addPlaylist(PlaylistAddDto playlistAddDto);
 
@@ -34,5 +32,4 @@ public interface PlaylistService extends IService<Playlist> {
     Result<Void> deletePlaylist(Long playlistId);
 
     Result<Void> deletePlaylists(List<Long> playlistIds);
-
 }

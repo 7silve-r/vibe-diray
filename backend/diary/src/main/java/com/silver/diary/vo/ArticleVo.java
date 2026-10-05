@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true) // 继承父类字段
-public class ArticleVO extends Article {
+public class ArticleVo extends Article {
     private Long likeCount;
     private Long favoriteCount;
     private Long commentCount;
@@ -15,7 +15,8 @@ public class ArticleVO extends Article {
     private String cateName;
     private String authorAvatar;
     private String authorNickname;
-    public ArticleVO(Article article) {
+
+    public ArticleVo(Article article) {
         super.setId(article.getId());
         super.setTitle(article.getTitle());
         super.setCateId(article.getCateId());

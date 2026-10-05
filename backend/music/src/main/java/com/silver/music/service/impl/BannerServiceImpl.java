@@ -1,40 +1,34 @@
 package com.silver.music.service.impl;
 
-import org.springframework.transaction.annotation.Transactional;
-
-import com.silver.diary.exception.BusinessException;
-
-import com.silver.music.constant.MessageConstant;
-import com.silver.music.enumeration.BannerStatusEnum;
-import com.silver.music.mapper.BannerMapper;
-import com.silver.music.dto.BannerDto;
-import com.silver.music.entity.Banner;
-import com.silver.music.vo.BannerVO;
-import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
-import com.silver.music.service.BannerService;
-import com.silver.music.service.MinioService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
+import com.silver.diary.common.PageResult;
+import com.silver.diary.common.Result;
+import com.silver.diary.exception.BusinessException;
+import com.silver.music.constant.MessageConstant;
+import com.silver.music.dto.BannerQueryDto;
+import com.silver.music.entity.Banner;
+import com.silver.music.enumeration.BannerStatusEnum;
+import com.silver.music.mapper.BannerMapper;
+import com.silver.music.service.BannerService;
+import com.silver.music.service.MinioService;
+import com.silver.music.vo.BannerVo;
+import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-
 public class BannerServiceImpl extends ServiceImpl<BannerMapper, Banner> implements BannerService {
 
-    @Autowired
-    private BannerMapper bannerMapper;
-    @Autowired
-    private MinioService minioService;
+    @Autowired private BannerMapper bannerMapper;
+    @Autowired private MinioService minioService;
 
     @Override
-    public Result<PageResult<Banner>> getAllBanners(BannerDto bannerDto) {
+    public Result<PageResult<Banner>> listBanners(BannerQueryDto bannerDto) {
 
         Page<Banner> page = new Page<>(bannerDto.getPageNum(), bannerDto.getPageSize());
         QueryWrapper<Banner> queryWrapper = new QueryWrapper<>();
@@ -45,9 +39,6 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, Banner> impleme
         queryWrapper.orderByDesc("id");
 
         IPage<Banner> bannerPage = bannerMapper.selectPage(page, queryWrapper);
-        if (bannerPage.getRecords().size() == 0) {
-            return Result.success(MessageConstant.DATA_NOT_FOUND, new PageResult<>(0L, null));
-        }
 
         return Result.success(new PageResult<>(bannerPage.getTotal(), bannerPage.getRecords()));
     }
@@ -102,7 +93,6 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, Banner> impleme
             throw new BusinessException(MessageConstant.UPDATE + MessageConstant.FAILED);
         }
         return Result.success(MessageConstant.UPDATE + MessageConstant.SUCCESS, null);
-
     }
 
     @Override
@@ -127,11 +117,13 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, Banner> impleme
     @Transactional
     public Result<Void> deleteBanners(List<Long> bannerIds) {
         List<Banner> banners = bannerMapper.selectByIds(bannerIds);
-        List<String> bannerUrlList = banners.stream()
-                .map(Banner::getBannerUrl)
-                .filter(url -> url != null && !url.isEmpty())
-                .toList();
-        bannerUrlList.forEach(url -> minioService.deleteFile(url));
+        List<String> bannerUrlList =
+                banners.stream()
+                        .map(Banner::getBannerUrl)
+                        .filter(url -> url != null && !url.isEmpty())
+                        .toList();
+        bannerUrlList.forEach(
+                url -> com.silver.music.upload.UploadCleanup.afterCommit(minioService, url));
 
         if (bannerMapper.deleteByIds(bannerIds) == 0) {
             throw new BusinessException(MessageConstant.DELETE + MessageConstant.FAILED);
@@ -140,21 +132,25 @@ public class BannerServiceImpl extends ServiceImpl<BannerMapper, Banner> impleme
     }
 
     @Override
-    public Result<List<BannerVO>> getBannerList() {
+    public Result<List<BannerVo>> getBannerList() {
 
-        List<Banner> banners = bannerMapper.selectList(new QueryWrapper<Banner>()
-                .eq("status", BannerStatusEnum.ENABLE.getId())
-                .orderByDesc("id")
-                .last("limit 9"));
+        List<Banner> banners =
+                bannerMapper.selectList(
+                        new QueryWrapper<Banner>()
+                                .eq("status", BannerStatusEnum.ENABLE.getId())
+                                .orderByDesc("id")
+                                .last("limit 9"));
 
-        List<BannerVO> bannerVOList = banners.stream()
-                .map(banner -> {
-                    BannerVO bannerVO = new BannerVO();
-                    BeanUtils.copyProperties(banner, bannerVO);
-                    return bannerVO;
-                }).toList();
+        List<BannerVo> bannerVoList =
+                banners.stream()
+                        .map(
+                                banner -> {
+                                    BannerVo bannerVo = new BannerVo();
+                                    BeanUtils.copyProperties(banner, bannerVo);
+                                    return bannerVo;
+                                })
+                        .toList();
 
-        return Result.success(bannerVOList);
+        return Result.success(bannerVoList);
     }
-
 }

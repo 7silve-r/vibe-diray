@@ -1,39 +1,34 @@
 package com.silver.music.controller;
 
-import com.silver.music.dto.ArtistDto;
-import com.silver.music.vo.ArtistDetailVO;
-import com.silver.music.vo.ArtistVO;
 import com.silver.diary.common.PageResult;
 import com.silver.diary.common.Result;
+import com.silver.music.dto.ArtistQueryDto;
 import com.silver.music.service.ArtistService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.silver.music.vo.ArtistDetailVo;
+import com.silver.music.vo.ArtistVo;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/music/public/artist")
 public class ArtistController {
 
-    @Autowired
-    private ArtistService artistService;
+    @Autowired private ArtistService artistService;
 
-    @PostMapping("/getAllArtists")
-    public Result<PageResult<ArtistVO>> getAllArtists(@RequestBody @Valid ArtistDto artistDto) {
-        return artistService.getAllArtists(artistDto);
+    @PostMapping("/listArtists")
+    public Result<PageResult<ArtistVo>> listArtists(@RequestBody @Valid ArtistQueryDto artistDto) {
+        return artistService.listArtists(artistDto);
     }
 
     @GetMapping("/getRandomArtists")
-    public Result<List<ArtistVO>> getRandomArtists() {
+    public Result<List<ArtistVo>> getRandomArtists() {
         return artistService.getRandomArtists();
     }
 
     @GetMapping("/getArtistDetail/{id}")
-    public Result<ArtistDetailVO> getArtistDetail(@PathVariable("id") Long artistId, HttpServletRequest request) {
-        return artistService.getArtistDetail(artistId, request);
+    public Result<ArtistDetailVo> getArtistDetail(@PathVariable("id") Long artistId) {
+        return artistService.getArtistDetail(artistId);
     }
-
 }

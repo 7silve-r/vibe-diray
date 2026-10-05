@@ -1,45 +1,38 @@
 package com.silver.music.controller;
 
-import com.silver.diary.exception.BusinessException;
-
+import com.silver.diary.common.PageResult;
+import com.silver.diary.common.Result;
 import com.silver.music.dto.*;
 import com.silver.music.entity.Artist;
 import com.silver.music.entity.Playlist;
-import com.silver.music.vo.ArtistNameVO;
-import com.silver.music.vo.SongAdminVO;
-
-import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
 import com.silver.music.service.*;
-import com.silver.music.utils.BindingResultUtil;
+import com.silver.music.vo.ArtistNameVo;
+import com.silver.music.vo.SongAdminVo;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/music/admin")
 public class AdminController {
 
-    @Autowired
-    private ArtistService artistService;
-    @Autowired
-    private SongService songService;
-    @Autowired
-    private PlaylistService playlistService;
+    @Autowired private ArtistService artistService;
+    @Autowired private SongService songService;
+    @Autowired private PlaylistService playlistService;
 
-    @GetMapping("/getAllArtistsCount")
-    public Result<Long> getAllArtistsCount(@RequestParam(required = false) Integer gender, @RequestParam(required = false) String area) {
-        return artistService.getAllArtistsCount(gender, area);
+    @GetMapping("/countArtists")
+    public Result<Long> countArtists(
+            @RequestParam(required = false) Integer gender,
+            @RequestParam(required = false) String area) {
+        return artistService.countArtists(gender, area);
     }
 
-    @PostMapping("/getAllArtists")
-    public Result<PageResult<Artist>> getAllArtists(@RequestBody @Valid ArtistDto artistDto) {
-        return artistService.getAllArtistsAndDetail(artistDto);
+    @PostMapping("/listArtists")
+    public Result<PageResult<Artist>> listArtists(@RequestBody @Valid ArtistQueryDto artistDto) {
+        return artistService.listAdminArtists(artistDto);
     }
 
     @PostMapping("/addArtist")
@@ -62,19 +55,20 @@ public class AdminController {
         return artistService.deleteArtists(artistIds);
     }
 
-    @GetMapping("/getAllSongsCount")
-    public Result<Long> getAllSongsCount(@RequestParam(required = false) String style) {
-        return songService.getAllSongsCount(style);
+    @GetMapping("/countSongs")
+    public Result<Long> countSongs(@RequestParam(required = false) String style) {
+        return songService.countSongs(style);
     }
 
-    @GetMapping("/getAllArtistNames")
-    public Result<List<ArtistNameVO>> getAllArtistNames() {
-        return artistService.getAllArtistNames();
+    @GetMapping("/listArtistNames")
+    public Result<List<ArtistNameVo>> listArtistNames() {
+        return artistService.listArtistNames();
     }
 
-    @PostMapping("/getAllSongsByArtist")
-    public Result<PageResult<SongAdminVO>> getAllSongsByArtist(@RequestBody @Valid SongAndArtistDto songDto) {
-        return songService.getAllSongsByArtist(songDto);
+    @PostMapping("/listAdminSongs")
+    public Result<PageResult<SongAdminVo>> listAdminSongs(
+            @RequestBody @Valid AdminSongQueryDto songDto) {
+        return songService.listAdminSongs(songDto);
     }
 
     @PostMapping("/addSong")
@@ -97,14 +91,15 @@ public class AdminController {
         return songService.deleteSongs(songIds);
     }
 
-    @GetMapping("/getAllPlaylistsCount")
-    public Result<Long> getAllPlaylistsCount(@RequestParam(required = false) String style) {
-        return playlistService.getAllPlaylistsCount(style);
+    @GetMapping("/countPlaylists")
+    public Result<Long> countPlaylists(@RequestParam(required = false) String style) {
+        return playlistService.countPlaylists(style);
     }
 
-    @PostMapping("/getAllPlaylists")
-    public Result<PageResult<Playlist>> getAllPlaylists(@RequestBody @Valid PlaylistDto playlistDto) {
-        return playlistService.getAllPlaylistsInfo(playlistDto);
+    @PostMapping("/listPlaylists")
+    public Result<PageResult<Playlist>> listPlaylists(
+            @RequestBody @Valid PlaylistQueryDto playlistDto) {
+        return playlistService.listAdminPlaylists(playlistDto);
     }
 
     @PostMapping("/addPlaylist")
@@ -126,5 +121,4 @@ public class AdminController {
     public Result<Void> deletePlaylists(@RequestBody List<Long> playlistIds) {
         return playlistService.deletePlaylists(playlistIds);
     }
-
 }

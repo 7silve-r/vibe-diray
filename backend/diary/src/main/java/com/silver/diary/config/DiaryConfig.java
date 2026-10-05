@@ -5,5 +5,4 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @MapperScan("com.silver.diary.mapper")
-public class DiaryConfig {
-}
+public class DiaryConfig {}

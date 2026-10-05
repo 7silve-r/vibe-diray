@@ -8,6 +8,7 @@ import lombok.Data;
 public class ArticleComment {
     @TableId(type = IdType.AUTO)
     private Integer id;
+
     private Integer articleId;
     private Integer userId;
     private String content;

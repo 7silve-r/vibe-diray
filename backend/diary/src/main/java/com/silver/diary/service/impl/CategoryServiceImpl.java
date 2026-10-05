@@ -7,5 +7,5 @@ import com.silver.diary.service.CategoryService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
-}
+public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category>
+        implements CategoryService {}

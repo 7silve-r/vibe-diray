@@ -44,7 +44,7 @@ async function load() {
     );
     rows.value = d.list;
     total.value = d.total;
-    if (auth.user) categories.value = await api('/my/cate');
+    if (auth.user) categories.value = await api('/my/categories');
   } catch (e) {
     error.value = (e as Error).message;
   } finally {
@@ -56,7 +56,7 @@ function write() {
 }
 async function saveCategory() {
   await ui.run(async () => {
-    await api('/my/cate', editId.value ? 'PUT' : 'POST', {
+    await api('/my/categories', editId.value ? 'PUT' : 'POST', {
       id: editId.value,
       cateName: name.value,
       cateAlias: alias.value,
@@ -70,7 +70,7 @@ async function saveCategory() {
 async function deleteCategory(id: number) {
   if (!(await ui.confirm('确定删除这个分类？有日记的分类需要先移走日记。'))) return;
   await ui.run(async () => {
-    await api('/my/cate?id=' + id, 'DELETE');
+    await api('/my/categories?id=' + id, 'DELETE');
     await load();
   }, '分类已删除');
 }

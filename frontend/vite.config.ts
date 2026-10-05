@@ -2,11 +2,16 @@ import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { fileURLToPath } from 'node:url';
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, fileURLToPath(new URL('../', import.meta.url)), 'APP_');
+  const env = loadEnv(mode, fileURLToPath(new URL('../', import.meta.url)), [
+    'APP_',
+    'WEB_',
+    'UPLOAD_',
+  ]);
   return {
     plugins: [vue()],
+    define: { __UPLOAD_PREFIX__: JSON.stringify(env.UPLOAD_URL_PREFIX || '/uploads/') },
     server: {
-      port: 5173,
+      port: Number(env.WEB_PORT || 5173),
       strictPort: true,
       proxy: {
         '/backend': {

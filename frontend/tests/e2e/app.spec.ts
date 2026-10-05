@@ -5,7 +5,7 @@ const song = {
   artistName: '测试歌手',
   album: '晴天',
   audioUrl: 'http://127.0.0.1:5173/test.wav',
-  likeStatus: 0,
+  favoriteStatus: 0,
 };
 const user = { id: 1, username: 'ADMIN', nickname: '管理员', role: 'ADMIN' };
 async function setup(page: Page, login = false) {
@@ -28,11 +28,11 @@ async function setup(page: Page, login = false) {
     const path = url.pathname.replace('/backend', '');
     let data: any = { list: [], total: 0 };
     if (path === '/api/login') data = 'test';
-    else if (path === '/my/userinfo') data = user;
-    else if (path === '/my/cate') data = [{ id: 1, cateName: '日常', cateAlias: 'daily' }];
-    else if (path.endsWith('getAllSongs')) data = { list: [song], total: 1 };
+    else if (path === '/my/profile') data = user;
+    else if (path === '/my/categories') data = [{ id: 1, cateName: '日常', cateAlias: 'daily' }];
+    else if (path.endsWith('listSongs')) data = { list: [song], total: 1 };
     else if (path.includes('getSongDetail')) data = { ...song, comments: [] };
-    else if (path.endsWith('getAllArtistNames')) data = [{ artistId: 1, artistName: '测试歌手' }];
+    else if (path.endsWith('listArtistNames')) data = [{ artistId: 1, artistName: '测试歌手' }];
     else if (path.endsWith('getBannerList') || path.endsWith('/styles')) data = [];
     else if (path.startsWith('/public/articles/') && !path.endsWith('/comments'))
       data = {
@@ -167,7 +167,7 @@ test('error', async ({ page }) => {
 
 test('expired', async ({ page }) => {
   await setup(page, true);
-  await page.route('**/backend/my/userinfo', (r) =>
+  await page.route('**/backend/my/profile', (r) =>
     r.fulfill({ status: 401, json: { code: 401, message: '登录已失效' } }),
   );
   await page.goto('/');
@@ -176,7 +176,7 @@ test('expired', async ({ page }) => {
 });
 test('admin upload', async ({ page }) => {
   await setup(page, true);
-  await page.route('**/backend/music/admin/getAllSongsByArtist', (r) =>
+  await page.route('**/backend/music/admin/listAdminSongs', (r) =>
     r.fulfill({ json: { code: 200, data: { list: [song], total: 1 } } }),
   );
   await page.goto('/admin');

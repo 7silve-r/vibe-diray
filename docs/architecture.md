@@ -7,6 +7,6 @@
 | MySQL | 127.0.0.1:3306 | 共用业务数据库 |
 | MinIO | 127.0.0.1:9000 | 公开音乐资源 |
 
-唯一后端启动类为 `com.silver.music.MusicApplication`。`music` 依赖 `diary` 模块，两个模块共用账号和数据库。后端端口由 `APP_PORT` 配置。
+唯一后端启动类为 `com.silver.VibeApplication`。`music` 依赖 `diary` 模块，两个模块共用账号和数据库。后端端口由 `APP_PORT` 配置。
 
 日记封面通过后端校验资源权限后读取。前端开发服务将 `/backend` 转发到统一后端。生产环境使用同源反向代理。

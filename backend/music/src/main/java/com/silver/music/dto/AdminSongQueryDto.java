@@ -1,21 +1,16 @@
 package com.silver.music.dto;
 
-import jakarta.validation.constraints.Min;
-
 import jakarta.validation.constraints.Max;
-
-import com.silver.music.enumeration.BannerStatusEnum;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Data;
 
 @Data
-public class BannerDto implements Serializable {
+public class AdminSongQueryDto implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @NotNull
     @Min(1)
@@ -26,6 +21,9 @@ public class BannerDto implements Serializable {
     @Max(100)
     private Integer pageSize = 10;
 
-    private BannerStatusEnum bannerStatus;
+    private Long artistId;
 
+    private String songName;
+
+    private String album;
 }

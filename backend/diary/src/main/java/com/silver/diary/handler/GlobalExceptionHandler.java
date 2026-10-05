@@ -21,8 +21,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({org.springframework.dao.DataIntegrityViolationException.class,
-            java.sql.SQLIntegrityConstraintViolationException.class})
+    @ExceptionHandler({
+        org.springframework.dao.DataIntegrityViolationException.class,
+        java.sql.SQLIntegrityConstraintViolationException.class
+    })
     public ResponseEntity<Result<Void>> handleConflict(Exception ex) {
         log.warn("数据约束冲突", ex);
         return ResponseEntity.status(409).body(error(409, "数据重复或仍被引用，请刷新后重试"));
@@ -55,26 +57,40 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     // 仅这个框架适配方法保留签名，实际 body 始终为 Result<Void>。
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
-            @NonNull Exception ex, Object body, @NonNull HttpHeaders headers,
-            HttpStatusCode status, @NonNull WebRequest request) {
-        String message = switch (status.value()) {
-            case 400 -> "请求参数缺失或格式错误";
-            case 401 -> "请先登录再操作";
-            case 403 -> "没有权限执行此操作";
-            case 404 -> "请求的资源不存在";
-            case 405 -> "不支持此请求方式";
-            case 413 -> "上传文件过大";
-            case 415 -> "不支持此请求内容类型";
-            default -> "请求处理失败";
-        };
+            @NonNull Exception ex,
+            Object body,
+            @NonNull HttpHeaders headers,
+            HttpStatusCode status,
+            @NonNull WebRequest request) {
+        String message =
+                switch (status.value()) {
+                    case 400 -> "请求参数缺失或格式错误";
+                    case 401 -> "请先登录再操作";
+                    case 403 -> "没有权限执行此操作";
+                    case 404 -> "请求的资源不存在";
+                    case 405 -> "不支持此请求方式";
+                    case 413 -> "上传文件过大";
+                    case 415 -> "不支持此请求内容类型";
+                    default -> "请求处理失败";
+                };
         if (ex instanceof HttpMessageNotReadableException) {
             message = "请求体格式错误，请检查 JSON";
         } else if (ex instanceof BindException binding) {
-            message = binding.getBindingResult().getAllErrors().stream()
-                    .map(error -> error instanceof org.springframework.validation.FieldError field && field.isBindingFailure()
-                            ? "请求参数类型错误" : error.getDefaultMessage())
-                    .filter(text -> text != null && !text.isBlank())
-                    .findFirst().orElse("请求参数校验失败");
+            message =
+                    binding.getBindingResult().getAllErrors().stream()
+                            .map(
+                                    error ->
+                                            error
+                                                                    instanceof
+                                                                    org.springframework.validation
+                                                                                    .FieldError
+                                                                            field
+                                                            && field.isBindingFailure()
+                                                    ? "请求参数类型错误"
+                                                    : error.getDefaultMessage())
+                            .filter(text -> text != null && !text.isBlank())
+                            .findFirst()
+                            .orElse("请求参数校验失败");
         } else if (ex instanceof ResponseStatusException responseStatus
                 && status.is4xxClientError()
                 && responseStatus.getReason() != null) {
@@ -85,8 +101,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             message = "服务器内部错误，请稍后重试";
         }
         // 保留 Spring 的 HTTP 状态及 Allow 等响应头。
-        return super.handleExceptionInternal(ex, error(status.value(), message),
-                headers, status, request);
+        return super.handleExceptionInternal(
+                ex, error(status.value(), message), headers, status, request);
     }
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)

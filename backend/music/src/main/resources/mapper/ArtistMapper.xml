@@ -3,7 +3,7 @@
 <mapper namespace="com.silver.music.mapper.ArtistMapper">
 
 
-    <resultMap id="ArtistDetailVOResultMap" type="com.silver.music.vo.ArtistDetailVO">
+    <resultMap id="ArtistDetailResult" type="com.silver.music.vo.ArtistDetailVo">
         <id column="artistId" property="artistId"/>
         <result column="artistName" property="artistName"/>
         <result column="gender" property="gender"/>
@@ -11,7 +11,7 @@
         <result column="birth" property="birth"/>
         <result column="area" property="area"/>
         <result column="introduction" property="introduction"/>
-        <collection property="songs" ofType="com.silver.music.vo.SongVO">
+        <collection property="songs" ofType="com.silver.music.vo.SongVo">
             <id column="songId" property="songId"/>
             <result column="songName" property="songName"/>
             <result column="artistNameOfSong" property="artistName"/>
@@ -24,7 +24,7 @@
     </resultMap>
 
 
-    <select id="getArtistDetailById" resultMap="ArtistDetailVOResultMap">
+    <select id="getArtistDetailById" resultMap="ArtistDetailResult">
         SELECT a.id           AS artistId,
                a.name         AS artistName,
                a.gender       AS gender,

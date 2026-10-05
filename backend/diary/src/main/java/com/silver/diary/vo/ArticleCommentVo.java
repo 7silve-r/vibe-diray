@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ArticleCommentVO extends ArticleComment {
+public class ArticleCommentVo extends ArticleComment {
     private String nickname;
     private String avatar;
     private Long likeCount;

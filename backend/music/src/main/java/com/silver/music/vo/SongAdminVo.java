@@ -1,17 +1,15 @@
 package com.silver.music.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
+import lombok.Data;
 
 @Data
-public class SongAdminVO implements Serializable {
+public class SongAdminVo implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     private Long songId;
 
@@ -33,5 +31,4 @@ public class SongAdminVO implements Serializable {
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseTime;
-
 }

@@ -52,7 +52,7 @@ async function init() {
   file.value = undefined;
   if (!auth.require()) return;
   try {
-    categories.value = await api('/my/cate');
+    categories.value = await api('/my/categories');
     if (route.params.id) {
       const d = await api('/my/article/info?id=' + route.params.id);
       title.value = d.title;
@@ -85,8 +85,8 @@ async function category() {
   const name = await ui.ask('给新分类起个名字');
   if (!name?.trim()) return;
   await ui.run(async () => {
-    await api('/my/cate', 'POST', { cateName: name.trim(), cateAlias: name.trim() });
-    categories.value = await api('/my/cate');
+    await api('/my/categories', 'POST', { cateName: name.trim(), cateAlias: name.trim() });
+    categories.value = await api('/my/categories');
     cateId.value = String(categories.value.at(-1)?.id || '');
   }, '分类已创建');
 }

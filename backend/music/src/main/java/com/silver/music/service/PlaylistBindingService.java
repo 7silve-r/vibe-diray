@@ -1,7 +1,7 @@
 package com.silver.music.service;
 
-import com.silver.music.entity.PlaylistBinding;
 import com.baomidou.mybatisplus.spring.service.IService;
+import com.silver.music.entity.PlaylistBinding;
 
 public interface PlaylistBindingService extends IService<PlaylistBinding> {
 

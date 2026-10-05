@@ -1,17 +1,16 @@
 package com.silver.music.service;
 
-import com.silver.music.dto.BannerDto;
-import com.silver.music.entity.Banner;
-import com.silver.music.vo.BannerVO;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.silver.diary.common.PageResult;
 import com.silver.diary.common.Result;
-import com.baomidou.mybatisplus.spring.service.IService;
-
+import com.silver.music.dto.BannerQueryDto;
+import com.silver.music.entity.Banner;
+import com.silver.music.vo.BannerVo;
 import java.util.List;
 
 public interface BannerService extends IService<Banner> {
 
-    Result<PageResult<Banner>> getAllBanners(BannerDto bannerDto);
+    Result<PageResult<Banner>> listBanners(BannerQueryDto bannerDto);
 
     Result<Void> addBanner(String bannerUrl);
 
@@ -23,5 +22,5 @@ public interface BannerService extends IService<Banner> {
 
     Result<Void> deleteBanners(List<Long> bannerIds);
 
-    Result<List<BannerVO>> getBannerList();
+    Result<List<BannerVo>> getBannerList();
 }

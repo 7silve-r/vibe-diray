@@ -1,3 +1,5 @@
+declare const __UPLOAD_PREFIX__: string;
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -12,7 +14,8 @@ export function token() {
 }
 export function media(url?: string) {
   if (!url) return '';
-  if (url.startsWith('/uploads/')) return base + url;
+  if (url.startsWith(typeof __UPLOAD_PREFIX__ === 'string' ? __UPLOAD_PREFIX__ : '/uploads/'))
+    return base + url;
   return /^(https?:|blob:)/.test(url) ? url : '';
 }
 export async function api<T = any>(path: string, method = 'GET', body?: unknown): Promise<T> {

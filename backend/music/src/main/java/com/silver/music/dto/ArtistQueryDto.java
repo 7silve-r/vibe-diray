@@ -1,20 +1,16 @@
 package com.silver.music.dto;
 
-import jakarta.validation.constraints.Min;
-
 import jakarta.validation.constraints.Max;
-
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.Data;
 
 @Data
-public class ArtistDto implements Serializable {
+public class ArtistQueryDto implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @NotNull
     @Min(1)
@@ -30,5 +26,4 @@ public class ArtistDto implements Serializable {
     private Integer gender;
 
     private String area;
-
 }
