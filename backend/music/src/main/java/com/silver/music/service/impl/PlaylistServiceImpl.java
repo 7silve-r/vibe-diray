@@ -48,7 +48,7 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
         if (playlistDto.getTitle() != null) {
             queryWrapper.like("title", playlistDto.getTitle());
         }
-        if (playlistDto.getStyle() != null) {
+        if (playlistDto.getStyle() != null && !playlistDto.getStyle().isBlank()) {
             queryWrapper.eq("style", playlistDto.getStyle());
         }
 
@@ -76,7 +76,7 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
         if (playlistDto.getTitle() != null) {
             queryWrapper.like("title", playlistDto.getTitle());
         }
-        if (playlistDto.getStyle() != null) {
+        if (playlistDto.getStyle() != null && !playlistDto.getStyle().isBlank()) {
             queryWrapper.eq("style", playlistDto.getStyle());
         }
 
@@ -177,7 +177,7 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
     @Override
     public Result<Long> countPlaylists(String style) {
         QueryWrapper<Playlist> queryWrapper = new QueryWrapper<>();
-        if (style != null) {
+        if (style != null && !style.isBlank()) {
             queryWrapper.eq("style", style);
         }
 
