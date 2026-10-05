@@ -25,6 +25,7 @@ function Read-EnvFile([string]$Path) {
 
 function Import-Settings {
     $values = Read-EnvFile (Join-Path $ProjectRoot '.env')
+    if (!$values.ContainsKey('DB_PASSWORD')) { throw 'Missing DB_PASSWORD in .env. Use DB_PASSWORD= for an account with no password.' }
     foreach ($key in $values.Keys) { [Environment]::SetEnvironmentVariable($key, $values[$key], 'Process') }
 }
 

@@ -5,7 +5,7 @@ $started = [Collections.Generic.List[string]]::new()
 try {
     $lock = Lock-Launcher
     Import-Settings
-    foreach ($name in @('DB_URL', 'DB_USER', 'DB_PASSWORD', 'JWT_SECRET', 'ADMIN_PASSWORD', 'MINIO_ENDPOINT', 'MINIO_ACCESS_KEY', 'MINIO_SECRET_KEY')) {
+    foreach ($name in @('DB_URL', 'DB_USER', 'JWT_SECRET', 'ADMIN_PASSWORD', 'MINIO_ENDPOINT', 'MINIO_ACCESS_KEY', 'MINIO_SECRET_KEY')) {
         if (!(Get-Setting $name)) { throw "Missing configuration: $name" }
     }
     if ([Text.Encoding]::UTF8.GetByteCount((Get-Setting 'JWT_SECRET')) -lt 32) { throw 'JWT_SECRET must contain at least 32 UTF-8 bytes.' }
