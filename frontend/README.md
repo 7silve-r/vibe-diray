@@ -4,6 +4,8 @@ Vue 3、TypeScript、Pinia 和 Vite 构建的音乐与日记客户端。
 
 ## 运行
 
+也可以直接使用项目根目录的 `start.cmd` 同时启动前后端，详见 [项目说明](../README.md)。
+
 需要 Node.js、npm，以及已配置 MySQL 和 MinIO 的后端服务。
 
 ```bash
@@ -12,7 +14,7 @@ npm ci
 npm run dev
 ```
 
-开发地址为 `http://127.0.0.1:5173`。Vite 将 `/backend` 请求转发到项目根目录 `.env` 中 `APP_PORT` 指定的后端端口，默认 8081。后端启动与环境变量见 `../backend/README.md`。
+默认开发地址为 `http://127.0.0.1:5173`，端口由根目录 `.env` 的 `WEB_PORT` 设置。Vite 将 `/backend` 请求转发到项目根目录 `.env` 中 `APP_PORT` 指定的后端端口，默认 8081。后端启动与环境变量见 `../backend/README.md`。
 
 前端环境变量参见 `.env.example`：
 
@@ -36,12 +38,13 @@ npm run dev
 ## 验证
 
 ```bash
+npm run format:check
 npm test
 npm run build
 npm run test:e2e
 ```
 
-单元测试使用 Vitest；浏览器测试使用 Playwright 和本机 Microsoft Edge，默认模拟接口，不修改数据库。
+`npm run format` 统一前端格式。单元测试使用 Vitest；浏览器测试使用 Playwright 和本机 Microsoft Edge，默认模拟接口，不修改数据库。
 
 启动真实后端后，可在 Git Bash 执行：
 
