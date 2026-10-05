@@ -1,9 +1,8 @@
 # 素材与诗文来源
 
-- `airi-full.png`：参照《蔚蓝档案》爱理原画生成的全身图，属于既有角色衍生图像。
-- `airi-cutout.png`：全身图的透明背景展示版本，用于欢迎页和主页。
-- `airi-stickers.png`：同一角色的六种状态表情，使用 CSS 定位显示。
-- 以上插画由 imagegen 生成。功能图标来自 lucide-vue-next（ISC License）；字体使用设备字体。
+- `sky-braids.png`：以提供的蓝发双麻花辫角色为参考，由 imagegen 生成并修订的天空插画，用于全站背景。属于既有角色衍生图像。
+- `braids-icons.png`：同一角色的六种淡彩简笔画状态，双辫自然垂落，按三列两行排列，通过 CSS 定位显示。
+- 功能图标来自 lucide-vue-next（ISC License）；字体使用设备字体。
 - 欢迎页《礼物》作者为切斯瓦夫·米沃什，采用提供的九行中文译文，译者未署名。
 
 ## 古诗出处

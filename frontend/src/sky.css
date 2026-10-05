@@ -1,0 +1,330 @@
+:root {
+  color: #34485c;
+  background: #edf4fb;
+  --ink: #34485c;
+  --muted: #63758a;
+  --accent: #507ca3;
+  --line: #ffffff80;
+  --shadow: 0 18px 60px #34547712;
+}
+.ambient {
+  background: #dcecfb;
+  isolation: isolate;
+}
+.sky-scene {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 75% center;
+}
+.ambient::before {
+  display: none;
+}
+.ambient::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, #f3f8fdf5, #f3f8fde8 60%, #f3f8fdd9);
+  transition: background 0.6s;
+}
+.ambient.is-home::after {
+  background:
+    linear-gradient(90deg, #f3f8fdf0 0%, #f3f8fde8 28%, #f3f8fdac 47%, #f3f8fd12 75%),
+    linear-gradient(0deg, #f3f8fdf5, transparent 65%);
+}
+.ambient.is-welcome::after {
+  background: linear-gradient(90deg, #eaf4fc80, #eaf4fc15 55%, transparent 75%);
+}
+.welcome {
+  grid-template-columns: minmax(0, 43%) 1fr;
+  grid-template-areas: 'title .' 'poem .' 'hint hint';
+  gap: 20px 0;
+  padding: 5vh 6vw 28px;
+  background: none;
+  align-content: center;
+}
+.welcome-copy {
+  padding: 0;
+  max-width: 440px;
+}
+.glass-wordmark {
+  font-size: clamp(80px, 35cqw, 158px);
+}
+.glass-wordmark span {
+  background-image: linear-gradient(
+    155deg,
+    #fffffffa 8%,
+    #ddecf990 30%,
+    #5c8fba90 46%,
+    #ffffffee 51%,
+    #e3f3fc90 70%,
+    #7297b6b0
+  );
+  -webkit-text-stroke: 1px #ffffffcf;
+  filter: drop-shadow(0 2px 2px #365a8450) drop-shadow(0 10px 18px #42618a20);
+}
+.welcome .gift-poem {
+  max-width: 440px;
+  padding: 8px 0 8px 16px;
+  border-left: 1px solid #ffffffa0;
+  color: #314e69;
+  text-shadow: 0 1px 8px #ffffffc0;
+}
+.welcome .gift-poem p {
+  font-size: 11px;
+  line-height: 2;
+}
+.welcome .gift-poem h2 {
+  color: #395d7d;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+.welcome .gift-poem cite {
+  color: #46627b;
+  margin-top: 12px;
+}
+.start-hint {
+  color: #365572;
+  text-shadow: 0 1px 8px white;
+  margin: 4px 0 0;
+}
+.enter-hint {
+  color: #486984;
+}
+.start-label::before,
+.start-label::after {
+  background: linear-gradient(90deg, transparent, #6286a5);
+}
+.home-studio {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+  grid-template-areas: 'heading .' 'poetry .';
+  min-height: 68svh;
+  padding: 36px 0 60px;
+  align-content: center;
+}
+.studio-heading {
+  align-self: auto;
+}
+.studio-heading h1 span,
+.studio-heading time,
+.poem-credit,
+.poem-number {
+  color: #5d7389;
+}
+.poetry-feature blockquote {
+  color: #3f5a74;
+}
+.poetry-feature {
+  padding-left: 20px;
+}
+.poetry-feature:before {
+  background: linear-gradient(transparent, #789dbb80, transparent);
+}
+.studio-mark {
+  color: #5c7892;
+}
+.moment {
+  margin-top: 0;
+  padding-top: 32px;
+  border-color: #91aec04d;
+}
+.character-icon {
+  aspect-ratio: 1;
+}
+.account-pill .character-icon {
+  width: 36px;
+  height: 36px;
+  margin: -3px 0;
+}
+.brand .character-icon {
+  width: 58px;
+}
+.brand,
+.main-nav a,
+.account-pill {
+  color: #3f5c77;
+}
+.main-nav a.active,
+.main-nav a.router-link-exact-active,
+.main-nav a:hover {
+  color: #255983;
+}
+.main-nav a::before {
+  background: #6c98ba;
+}
+.primary,
+.player-restore {
+  background: #d2e6f6;
+  color: #315f83;
+}
+button.primary:hover:not(:disabled) {
+  background: #bdd9ee;
+}
+.badge {
+  background: #d8e9f080;
+  color: #416882;
+}
+.tabs button.active,
+.mood-options button.selected {
+  color: #315f83;
+  border-bottom-color: #6e97b8;
+}
+input,
+textarea,
+select {
+  border-bottom-color: #8fa9bd66;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  border-bottom-color: #587fa1;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #697f94;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline-color: #537fa5;
+}
+.modal {
+  background: linear-gradient(130deg, #f9fcfff5, #edf5fcf5);
+}
+.toast {
+  background: #f5faffee;
+}
+.site-footer {
+  color: #647b90;
+}
+@media (max-width: 1000px) {
+  .welcome {
+    grid-template-columns: minmax(0, 48%) 1fr;
+    padding-inline: 5vw;
+  }
+  .home-studio {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    column-gap: 24px;
+  }
+}
+@media (max-width: 600px) {
+  .ambient.is-welcome .sky-scene {
+    object-position: 74% top;
+    height: 58svh;
+  }
+  .ambient.is-welcome {
+    background: #eaf3fc;
+  }
+  .ambient.is-welcome::after {
+    background: linear-gradient(0deg, #eaf3fc 40%, #eaf3fc20 65%, transparent);
+  }
+  .welcome {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'title' 'poem' 'hint';
+    padding: 29svh 24px 26px;
+    gap: 20px;
+  }
+  .welcome-copy {
+    width: 76%;
+    max-width: 300px;
+  }
+  .glass-wordmark {
+    font-size: clamp(80px, 40cqw, 120px);
+  }
+  .welcome .gift-poem {
+    width: 100%;
+    max-width: none;
+    padding: 0 0 0 12px;
+  }
+  .welcome .gift-poem p {
+    font-size: 10px;
+    line-height: 2.1;
+    white-space: normal;
+  }
+  .welcome .gift-poem cite {
+    font-size: 10px;
+  }
+  .ambient.is-home .sky-scene {
+    object-position: 76% top;
+    height: 70svh;
+  }
+  .ambient.is-home {
+    background: #edf4fb;
+  }
+  .ambient.is-home::after {
+    background: linear-gradient(0deg, #edf4fb 30%, #edf4fbb0 62%, #edf4fb45);
+  }
+  .home-studio {
+    display: block;
+    min-height: 0;
+    padding: 28svh 0 36px;
+    margin-top: 0;
+  }
+  .studio-heading {
+    padding: 18px 0 22px;
+  }
+  .studio-heading h1 {
+    font-size: 36px;
+  }
+  .studio-heading .eyebrow {
+    max-width: none;
+  }
+  .poetry-feature {
+    padding: 16px 0 16px 16px;
+  }
+  .poetry-feature blockquote {
+    font-size: 23px;
+  }
+  .sidebar,
+  .sidebar.open {
+    background: #f0f7fcf5;
+  }
+  .menu-toggle {
+    background: #f4f9fcbd;
+  }
+  .account-bar {
+    background: linear-gradient(#edf4fbe8, #edf4fb00);
+  }
+}
+@media (forced-colors: active) {
+  .ambient {
+    display: none;
+  }
+  .glass-wordmark span {
+    background: none;
+    -webkit-text-fill-color: CanvasText;
+    -webkit-text-stroke: 0;
+    filter: none;
+  }
+}
+
+.character-icon {
+  filter: none;
+  mix-blend-mode: multiply;
+}
+@media (min-width: 601px) and (max-height: 820px) {
+  .welcome {
+    gap: 14px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .glass-wordmark {
+    font-size: clamp(72px, 27cqw, 118px);
+  }
+  .welcome .gift-poem p {
+    line-height: 1.85;
+  }
+}
+
+.sidebar,
+.state-panel {
+  mix-blend-mode: multiply;
+}
+@media (max-width: 600px) {
+  .sidebar {
+    mix-blend-mode: normal;
+  }
+}

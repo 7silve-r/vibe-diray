@@ -86,14 +86,6 @@ onBeforeUnmount(() => clearInterval(clock));
       <h1>今日<span>的一隅</span></h1>
       <time :datetime="day">{{ dateLabel }}</time>
     </div>
-    <div class="studio-character">
-      <div class="studio-orbit" aria-hidden="true"></div>
-      <img
-        src="/airi-cutout.png"
-        alt="身穿水手服、手拿冰淇淋的爱理全身插画"
-        fetchpriority="high"
-      /><span aria-hidden="true" class="studio-star">✧</span>
-    </div>
     <section class="poetry-feature" aria-label="今日诗签">
       <div class="row">
         <span class="eyebrow">今日诗签</span

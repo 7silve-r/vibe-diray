@@ -49,8 +49,12 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-  <div class="ambient" aria-hidden="true">
-    <i v-for="n in 6" :key="n" :style="{ '--n': n }"></i>
+  <div
+    class="ambient"
+    :class="{ 'is-welcome': welcome, 'is-home': !welcome && route.path === '/' }"
+    aria-hidden="true"
+  >
+    <img class="sky-scene" src="/sky-braids.png" alt="" fetchpriority="high" />
   </div>
   <div
     v-if="welcome"
@@ -66,10 +70,6 @@ onBeforeUnmount(() => {
         <span class="word-random" aria-hidden="true">Random</span>
         <span class="word-notes" aria-hidden="true">Notes</span>
       </h1>
-    </div>
-    <div class="welcome-character">
-      <div class="welcome-orbit" aria-hidden="true"></div>
-      <img src="/airi-cutout.png" alt="爱理全身插画" fetchpriority="high" />
     </div>
     <GiftPoem />
     <span class="start-hint"
