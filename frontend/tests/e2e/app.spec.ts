@@ -320,3 +320,36 @@ for (const artistList of [null, []]) {
     expect(errors).toEqual([]);
   });
 }
+
+test('playlist styles', async ({ page }) => {
+  await setup(page);
+  await page.route('**/backend/music/public/styles', (route) =>
+    route.fulfill({ json: { code: 200, data: [{ styleId: 1, name: '流行' }] } }),
+  );
+  const filters: unknown[] = [];
+  await page.route('**/backend/music/public/playlist/listPlaylists', (route) => {
+    const body = route.request().postDataJSON();
+    filters.push(body.style);
+    const list =
+      body.style === '流行'
+        ? [{ playlistId: 1, title: '流行歌单' }]
+        : [
+            { playlistId: 1, title: '流行歌单' },
+            { playlistId: 2, title: '摇滚歌单' },
+          ];
+    return route.fulfill({ json: { code: 200, data: { list, total: list.length } } });
+  });
+  await page.goto('/music');
+  await page.getByRole('button', { name: '歌单', exact: true }).click();
+  await expect(page.getByText('流行歌单', { exact: true })).toBeVisible();
+  await expect(page.getByText('摇滚歌单', { exact: true })).toBeVisible();
+  await page.getByLabel('音乐风格').selectOption({ label: '流行' });
+  await page.getByRole('button', { name: '搜索', exact: true }).click();
+  await expect(page.getByText('摇滚歌单', { exact: true })).toHaveCount(0);
+  await page.getByLabel('音乐风格').selectOption('');
+  await page.getByRole('button', { name: '搜索', exact: true }).click();
+  await expect(page.getByText('摇滚歌单', { exact: true })).toBeVisible();
+  expect(filters[0]).toBeUndefined();
+  expect(filters).toContain('流行');
+  expect(filters.at(-1)).toBeUndefined();
+});

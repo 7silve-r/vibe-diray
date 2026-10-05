@@ -293,4 +293,35 @@ class MusicTest {
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data").isEmpty());
     }
+
+    @Test
+    void allStyles() throws Exception {
+        jdbc.update("UPDATE tb_playlist SET style = '流行' WHERE id = 1");
+        jdbc.update(
+                "INSERT INTO tb_playlist (id, title, style) VALUES (2, '摇滚歌单', '摇滚'), (3, '未分类', NULL)");
+        for (String style : new String[] {"null", "\"\"", "\"   \""}) {
+            String body = "{\"pageNum\":1,\"pageSize\":10,\"style\":" + style + "}";
+            mvc.perform(
+                            post("/music/public/playlist/listPlaylists")
+                                    .contentType("application/json")
+                                    .content(body))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.total").value(3))
+                    .andExpect(jsonPath("$.data.list.length()").value(3));
+            mvc.perform(
+                            post("/music/admin/listPlaylists")
+                                    .header("Authorization", jwt.generateToken("ADMIN"))
+                                    .contentType("application/json")
+                                    .content(body))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.data.total").value(3));
+        }
+        mvc.perform(
+                        post("/music/public/playlist/listPlaylists")
+                                .contentType("application/json")
+                                .content("{\"style\":\"流行\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.list[0].playlistId").value(1));
+    }
 }

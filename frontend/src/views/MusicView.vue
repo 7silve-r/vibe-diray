@@ -67,7 +67,7 @@ async function load() {
           tab.value === 'artists' || searchBy.value === 'artistName' ? search.value : undefined,
         album: searchBy.value === 'album' ? search.value : undefined,
         title: search.value,
-        style: style.value,
+        style: style.value || undefined,
       };
       let data: any;
       if (tab.value === 'songs')
