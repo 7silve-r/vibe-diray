@@ -281,4 +281,16 @@ class MusicTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].playlistId").value(2));
     }
+
+    @Test
+    void noArtists() throws Exception {
+        jdbc.update("DELETE FROM tb_song");
+        jdbc.update("DELETE FROM tb_artist");
+        mvc.perform(
+                        get("/music/admin/listArtistNames")
+                                .header("Authorization", jwt.generateToken("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
 }

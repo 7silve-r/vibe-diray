@@ -284,3 +284,39 @@ test('moment', async ({ page }) => {
   await page.getByRole('button', { name: '退出登录' }).click();
   await expect(page.getByLabel('今日留笺', { exact: true })).toHaveValue('游客留笺');
 });
+
+for (const artistList of [null, []]) {
+  test(`empty artists ${artistList === null ? 'null' : 'array'}`, async ({ page }) => {
+    await setup(page, true);
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.route('**/backend/music/admin/listArtistNames', (route) =>
+      route.fulfill({ json: { code: 200, data: artistList } }),
+    );
+    const loaded = page.waitForResponse('**/backend/music/admin/listArtistNames');
+    await page.goto('/admin');
+    await loaded;
+    await expect(page.getByRole('heading', { name: '管理中心' })).toBeVisible();
+    await page.getByRole('button', { name: '歌手管理', exact: true }).click();
+    for (const name of ['歌曲', '歌手', '歌单']) {
+      await page.getByRole('button', { name: `${name}管理`, exact: true }).click();
+      await page.getByRole('button', { name: `＋ 新建${name}`, exact: true }).click();
+      const dialog = page.getByRole('dialog', { name: `新建${name}`, exact: true });
+      await expect(dialog).toBeVisible();
+      if (name === '歌曲') {
+        await expect(dialog.getByText('请先在歌手管理中创建歌手。')).toBeVisible();
+      } else {
+        await dialog.getByLabel(name === '歌手' ? '歌手名称' : '歌单名称').fill(`测试${name}`);
+        const saved = page.waitForRequest((request) =>
+          request.url().endsWith(name === '歌手' ? '/addArtist' : '/addPlaylist'),
+        );
+        await dialog.getByRole('button', { name: '保存', exact: true }).click();
+        expect((await saved).method()).toBe('POST');
+        await expect(dialog).toHaveCount(0);
+        continue;
+      }
+      await dialog.getByRole('button', { name: '关闭', exact: true }).click();
+    }
+    expect(errors).toEqual([]);
+  });
+}
