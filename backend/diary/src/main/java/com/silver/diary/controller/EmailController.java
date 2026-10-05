@@ -9,22 +9,24 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class EmailController {
-    @Autowired
-    private EmailService emailService;
+    @Autowired private EmailService emailService;
 
     @PostMapping("/api/email/code")
     public Result<Void> send(@RequestBody EmailDto dto) {
-        emailService.send(dto); return Result.success();
+        emailService.send(dto);
+        return Result.success();
     }
 
     @PostMapping("/my/email")
     @PreAuthorize("hasRole('USER')")
     public Result<Void> bind(@RequestBody EmailDto dto) {
-        emailService.bind(dto); return Result.success();
+        emailService.bind(dto);
+        return Result.success();
     }
 
     @PostMapping("/api/password/reset")
     public Result<Void> reset(@RequestBody EmailDto dto) {
-        emailService.reset(dto); return Result.success();
+        emailService.reset(dto);
+        return Result.success();
     }
 }

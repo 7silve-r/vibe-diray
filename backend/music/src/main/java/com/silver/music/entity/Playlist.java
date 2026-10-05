@@ -1,21 +1,18 @@
 package com.silver.music.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-
+import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serial;
 import java.io.Serializable;
 import lombok.Data;
 
 @Data
-
 @TableName("tb_playlist")
 public class Playlist implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long playlistId;
@@ -31,5 +28,4 @@ public class Playlist implements Serializable {
 
     @TableField("style")
     private String style;
-
 }

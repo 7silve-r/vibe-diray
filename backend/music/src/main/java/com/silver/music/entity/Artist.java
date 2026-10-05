@@ -5,19 +5,16 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
+import lombok.Data;
 
 @Data
-
 @TableName("tb_artist")
 public class Artist implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Serial private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long artistId;
@@ -40,5 +37,4 @@ public class Artist implements Serializable {
 
     @TableField("introduction")
     private String introduction;
-
 }

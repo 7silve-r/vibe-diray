@@ -3,12 +3,12 @@
 <mapper namespace="com.silver.music.mapper.PlaylistMapper">
 
 
-    <resultMap id="PlaylistDetailVOResultMap" type="com.silver.music.vo.PlaylistDetailVO">
+    <resultMap id="PlaylistDetailResult" type="com.silver.music.vo.PlaylistDetailVo">
         <id column="playlistId" property="playlistId"/>
         <result column="title" property="title"/>
         <result column="coverUrl" property="coverUrl"/>
         <result column="introduction" property="introduction"/>
-        <collection property="songs" ofType="com.silver.music.vo.SongVO">
+        <collection property="songs" ofType="com.silver.music.vo.SongVo">
             <id column="songId" property="songId"/>
             <result column="songName" property="songName"/>
             <result column="artistName" property="artistName"/>
@@ -18,7 +18,7 @@
             <result column="audioUrl" property="audioUrl"/>
             <result column="releaseTime" property="releaseTime"/>
         </collection>
-        <collection property="comments" ofType="com.silver.music.vo.CommentVO">
+        <collection property="comments" ofType="com.silver.music.vo.CommentVo">
             <id column="commentId" property="commentId"/>
             <result column="username" property="username"/>
             <result column="userAvatar" property="userAvatar"/>
@@ -29,7 +29,7 @@
     </resultMap>
 
 
-    <select id="getPlaylistDetailById" resultMap="PlaylistDetailVOResultMap">
+    <select id="getPlaylistDetailById" resultMap="PlaylistDetailResult">
         SELECT p.id           AS playlistId,
                p.title        AS title,
                p.cover_url    AS coverUrl,
@@ -68,11 +68,11 @@
     </select>
 
 
-    <select id="getRecommendedPlaylistsByStyles" resultType="com.silver.music.vo.PlaylistVO">
-        SELECT *
+    <select id="getRecommendedPlaylistsByStyles" resultType="com.silver.music.vo.PlaylistVo">
+        SELECT id AS playlistId, title, cover_url AS coverUrl
         FROM tb_playlist
         WHERE style IN
-        <foreach item="style" collection="sortedStyleIds" open="(" separator="," close=")">
+        <foreach item="style" collection="styles" open="(" separator="," close=")">
             #{style}
         </foreach>
         AND id NOT IN
@@ -84,7 +84,7 @@
     </select>
 
 
-    <select id="getPlaylistsByIds" resultType="com.silver.music.vo.PlaylistVO">
+    <select id="getPlaylistsByIds" resultType="com.silver.music.vo.PlaylistVo">
         SELECT
         p.id AS playlistId,
         p.title AS title,

@@ -1,57 +1,46 @@
 package com.silver.music.service.impl;
 
-import org.springframework.transaction.annotation.Transactional;
-
-import com.silver.diary.exception.BusinessException;
-
-import com.silver.music.constant.JwtClaimsConstant;
-import com.silver.music.constant.MessageConstant;
-import com.silver.music.enumeration.LikeStatusEnum;
-import com.silver.music.enumeration.RoleEnum;
-import com.silver.music.mapper.PlaylistMapper;
-import com.silver.music.mapper.UserFavoriteMapper;
-import com.silver.music.dto.PlaylistAddDto;
-import com.silver.music.dto.PlaylistDto;
-import com.silver.music.dto.PlaylistUpdateDto;
-import com.silver.music.entity.Playlist;
-import com.silver.music.entity.UserFavorite;
-import com.silver.music.vo.PlaylistDetailVO;
-import com.silver.music.vo.PlaylistVO;
-import com.silver.music.vo.SongVO;
-import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
-import com.silver.music.service.PlaylistService;
-import com.silver.music.service.MinioService;
-import com.silver.music.utils.CurrentUserUtil;
-import com.silver.music.utils.TypeConversionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
-import jakarta.servlet.http.HttpServletRequest;
+import com.silver.diary.common.PageResult;
+import com.silver.diary.common.Result;
+import com.silver.diary.exception.BusinessException;
+import com.silver.diary.utils.SecurityUtil;
+import com.silver.music.constant.MessageConstant;
+import com.silver.music.dto.PlaylistAddDto;
+import com.silver.music.dto.PlaylistQueryDto;
+import com.silver.music.dto.PlaylistUpdateDto;
+import com.silver.music.entity.Playlist;
+import com.silver.music.entity.UserFavorite;
+import com.silver.music.enumeration.FavoriteStatus;
+import com.silver.music.mapper.PlaylistMapper;
+import com.silver.music.mapper.UserFavoriteMapper;
+import com.silver.music.service.MinioService;
+import com.silver.music.service.PlaylistService;
+import com.silver.music.vo.PlaylistDetailVo;
+import com.silver.music.vo.PlaylistVo;
+import com.silver.music.vo.SongVo;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
+        implements PlaylistService {
 
-public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist> implements PlaylistService {
-
-    @Autowired
-    private PlaylistMapper playlistMapper;
-    @Autowired
-    private UserFavoriteMapper userFavoriteMapper;
-    @Autowired
-    private MinioService minioService;
+    @Autowired private PlaylistMapper playlistMapper;
+    @Autowired private UserFavoriteMapper userFavoriteMapper;
+    @Autowired private MinioService minioService;
 
     @Override
-    public Result<PageResult<PlaylistVO>> getAllPlaylists(PlaylistDto playlistDto) {
+    public Result<PageResult<PlaylistVo>> listPlaylists(PlaylistQueryDto playlistDto) {
 
         Page<Playlist> page = new Page<>(playlistDto.getPageNum(), playlistDto.getPageSize());
         QueryWrapper<Playlist> queryWrapper = new QueryWrapper<>();
@@ -64,22 +53,22 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist> i
         }
 
         IPage<Playlist> playlistPage = playlistMapper.selectPage(page, queryWrapper);
-        if (playlistPage.getRecords().size() == 0) {
-            return Result.success(MessageConstant.DATA_NOT_FOUND, new PageResult<>(0L, null));
-        }
 
-        List<PlaylistVO> playlistVOList = playlistPage.getRecords().stream()
-                .map(playlist -> {
-                    PlaylistVO playlistVO = new PlaylistVO();
-                    BeanUtils.copyProperties(playlist, playlistVO);
-                    return playlistVO;
-                }).toList();
+        List<PlaylistVo> playlistVoList =
+                playlistPage.getRecords().stream()
+                        .map(
+                                playlist -> {
+                                    PlaylistVo playlistVo = new PlaylistVo();
+                                    BeanUtils.copyProperties(playlist, playlistVo);
+                                    return playlistVo;
+                                })
+                        .toList();
 
-        return Result.success(new PageResult<>(playlistPage.getTotal(), playlistVOList));
+        return Result.success(new PageResult<>(playlistPage.getTotal(), playlistVoList));
     }
 
     @Override
-    public Result<PageResult<Playlist>> getAllPlaylistsInfo(PlaylistDto playlistDto) {
+    public Result<PageResult<Playlist>> listAdminPlaylists(PlaylistQueryDto playlistDto) {
 
         Page<Playlist> page = new Page<>(playlistDto.getPageNum(), playlistDto.getPageSize());
         QueryWrapper<Playlist> queryWrapper = new QueryWrapper<>();
@@ -94,34 +83,14 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist> i
         queryWrapper.orderByDesc("id");
 
         IPage<Playlist> playlistPage = playlistMapper.selectPage(page, queryWrapper);
-        if (playlistPage.getRecords().size() == 0) {
-            return Result.success(MessageConstant.DATA_NOT_FOUND, new PageResult<>(0L, null));
-        }
 
         return Result.success(new PageResult<>(playlistPage.getTotal(), playlistPage.getRecords()));
     }
 
     @Override
-    public Result<List<PlaylistVO>> getRecommendedPlaylists(HttpServletRequest request) {
+    public Result<List<PlaylistVo>> getRecommendedPlaylists() {
 
-        String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        Map<String, Object> map = null;
-        if (token != null && !token.isEmpty()) {
-            map = CurrentUserUtil.get();
-        }
-
-        Long userId = null;
-        if (map != null) {
-            String role = (String) map.get(JwtClaimsConstant.ROLE);
-            if ((role.equals(RoleEnum.USER.getRole()) || role.equals(RoleEnum.ADMIN.getRole()))) {
-                Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-                userId = TypeConversionUtil.toLong(userIdObj);
-            }
-        }
+        Long userId = SecurityUtil.optionalUserId();
 
         if (userId == null) {
             return Result.success(playlistMapper.getRandomPlaylists(10));
@@ -133,25 +102,31 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist> i
         }
 
         List<String> favoriteStyles = playlistMapper.getFavoritePlaylistStyles(favoritePlaylistIds);
-        List<Long> favoriteStyleIds = userFavoriteMapper.getFavoriteIdsByStyle(favoriteStyles);
-        Map<Long, Long> styleFrequency = favoriteStyleIds.stream()
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        List<String> styles =
+                favoriteStyles.stream()
+                        .filter(style -> style != null && !style.isBlank())
+                        .distinct()
+                        .toList();
 
-        List<Long> sortedStyleIds = styleFrequency.entrySet().stream()
-                .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
-
-        List<PlaylistVO> recommendedPlaylists = playlistMapper.getRecommendedPlaylistsByStyles(sortedStyleIds, favoritePlaylistIds, 10);
+        List<PlaylistVo> recommendedPlaylists =
+                styles.isEmpty()
+                        ? new ArrayList<>()
+                        : new ArrayList<>(
+                                playlistMapper.getRecommendedPlaylistsByStyles(
+                                        styles, favoritePlaylistIds, 10));
 
         if (recommendedPlaylists.size() < 10) {
-            List<PlaylistVO> randomPlaylists = playlistMapper.getRandomPlaylists(10);
-            Set<Long> addedPlaylistIds = recommendedPlaylists.stream().map(PlaylistVO::getPlaylistId).collect(Collectors.toSet());
+            List<PlaylistVo> randomPlaylists = playlistMapper.getRandomPlaylists(10);
+            Set<Long> addedPlaylistIds =
+                    recommendedPlaylists.stream()
+                            .map(PlaylistVo::getPlaylistId)
+                            .collect(Collectors.toSet());
 
-            for (PlaylistVO playlist : randomPlaylists) {
+            for (PlaylistVo playlist : randomPlaylists) {
                 if (recommendedPlaylists.size() >= 10) break;
                 if (!addedPlaylistIds.contains(playlist.getPlaylistId())) {
                     recommendedPlaylists.add(playlist);
+                    addedPlaylistIds.add(playlist.getPlaylistId());
                 }
             }
         }
@@ -160,59 +135,47 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist> i
     }
 
     @Override
-    public Result<PlaylistDetailVO> getPlaylistDetail(Long playlistId, HttpServletRequest request) {
-        PlaylistDetailVO playlistDetailVO = playlistMapper.getPlaylistDetailById(playlistId);
-        if (playlistDetailVO == null) throw new BusinessException(404, "歌单不存在");
+    public Result<PlaylistDetailVo> getPlaylistDetail(Long playlistId) {
+        PlaylistDetailVo playlistDetailVo = playlistMapper.getPlaylistDetailById(playlistId);
+        if (playlistDetailVo == null) throw new BusinessException(404, "歌单不存在");
 
-        List<SongVO> songVOList = playlistDetailVO.getSongs();
-        songVOList.forEach(songVO -> songVO.setLikeStatus(LikeStatusEnum.DEFAULT.getId()));
-        playlistDetailVO.setLikeStatus(LikeStatusEnum.DEFAULT.getId());
+        List<SongVo> songVoList = playlistDetailVo.getSongs();
+        songVoList.forEach(songVo -> songVo.setFavoriteStatus(FavoriteStatus.NONE.getId()));
+        playlistDetailVo.setFavoriteStatus(FavoriteStatus.NONE.getId());
 
-        String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
+        Long userId = SecurityUtil.optionalUserId();
 
-        Map<String, Object> map = null;
-        if (token != null && !token.isEmpty()) {
-            map = CurrentUserUtil.get();
-        }
+        if (userId != null) {
 
-        if (map != null) {
-            String role = (String) map.get(JwtClaimsConstant.ROLE);
-            if ((role.equals(RoleEnum.USER.getRole()) || role.equals(RoleEnum.ADMIN.getRole()))) {
-                Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-                Long userId = TypeConversionUtil.toLong(userIdObj);
+            UserFavorite favoritePlaylist =
+                    userFavoriteMapper.selectOne(
+                            new QueryWrapper<UserFavorite>()
+                                    .eq("user_id", userId)
+                                    .eq("type", 1)
+                                    .eq("playlist_id", playlistId));
+            if (favoritePlaylist != null) {
+                playlistDetailVo.setFavoriteStatus(FavoriteStatus.SAVED.getId());
+            }
 
-                UserFavorite favoritePlaylist = userFavoriteMapper.selectOne(new QueryWrapper<UserFavorite>()
-                        .eq("user_id", userId)
-                        .eq("type", 1)
-                        .eq("playlist_id", playlistId));
-                if (favoritePlaylist != null) {
-                    playlistDetailVO.setLikeStatus(LikeStatusEnum.LIKE.getId());
-                }
+            List<UserFavorite> favoriteSongs =
+                    userFavoriteMapper.selectList(
+                            new QueryWrapper<UserFavorite>().eq("user_id", userId).eq("type", 0));
 
-                List<UserFavorite> favoriteSongs = userFavoriteMapper.selectList(new QueryWrapper<UserFavorite>()
-                        .eq("user_id", userId)
-                        .eq("type", 0));
+            Set<Long> favoriteSongIds =
+                    favoriteSongs.stream().map(UserFavorite::getSongId).collect(Collectors.toSet());
 
-                Set<Long> favoriteSongIds = favoriteSongs.stream()
-                        .map(UserFavorite::getSongId)
-                        .collect(Collectors.toSet());
-
-                for (SongVO songVO : songVOList) {
-                    if (favoriteSongIds.contains(songVO.getSongId())) {
-                        songVO.setLikeStatus(LikeStatusEnum.LIKE.getId());
-                    }
+            for (SongVo songVo : songVoList) {
+                if (favoriteSongIds.contains(songVo.getSongId())) {
+                    songVo.setFavoriteStatus(FavoriteStatus.SAVED.getId());
                 }
             }
         }
 
-        return Result.success(playlistDetailVO);
+        return Result.success(playlistDetailVo);
     }
 
     @Override
-    public Result<Long> getAllPlaylistsCount(String style) {
+    public Result<Long> countPlaylists(String style) {
         QueryWrapper<Playlist> queryWrapper = new QueryWrapper<>();
         if (style != null) {
             queryWrapper.eq("style", style);
@@ -242,7 +205,9 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist> i
     public Result<Void> updatePlaylist(PlaylistUpdateDto playlistUpdateDto) {
         Long playlistId = playlistUpdateDto.getPlaylistId();
 
-        Playlist playlistByTitle = playlistMapper.selectOne(new QueryWrapper<Playlist>().eq("title", playlistUpdateDto.getTitle()));
+        Playlist playlistByTitle =
+                playlistMapper.selectOne(
+                        new QueryWrapper<Playlist>().eq("title", playlistUpdateDto.getTitle()));
         if (playlistByTitle != null && !playlistByTitle.getPlaylistId().equals(playlistId)) {
             throw new BusinessException(MessageConstant.PLAYLIST + MessageConstant.ALREADY_EXISTS);
         }
@@ -297,10 +262,11 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist> i
     @Transactional
     public Result<Void> deletePlaylists(List<Long> playlistIds) {
         List<Playlist> playlists = playlistMapper.selectBatchIds(playlistIds);
-        List<String> coverUrlList = playlists.stream()
-                .map(Playlist::getCoverUrl)
-                .filter(coverUrl -> coverUrl != null && !coverUrl.isEmpty())
-                .toList();
+        List<String> coverUrlList =
+                playlists.stream()
+                        .map(Playlist::getCoverUrl)
+                        .filter(coverUrl -> coverUrl != null && !coverUrl.isEmpty())
+                        .toList();
 
         for (String coverUrl : coverUrlList) {
             com.silver.music.upload.UploadCleanup.afterCommit(minioService, coverUrl);
@@ -312,5 +278,4 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist> i
 
         return Result.success(MessageConstant.DELETE + MessageConstant.SUCCESS, null);
     }
-
 }

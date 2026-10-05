@@ -1,24 +1,24 @@
 package com.silver.music.mapper;
 
-import com.silver.music.entity.Song;
-import com.silver.music.vo.SongAdminVO;
-import com.silver.music.vo.SongDetailVO;
-import com.silver.music.vo.SongVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.silver.music.entity.Song;
+import com.silver.music.vo.SongAdminVo;
+import com.silver.music.vo.SongDetailVo;
+import com.silver.music.vo.SongVo;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
 
 @Mapper
 public interface SongMapper extends BaseMapper<Song> {
     @Select("SELECT * FROM tb_song WHERE id = #{id} FOR UPDATE")
     Song lock(Long id);
 
-    @Select("""
+    @Select(
+            """
                 SELECT
                     s.id AS songId,
                     s.name AS songName,
@@ -35,12 +35,14 @@ public interface SongMapper extends BaseMapper<Song> {
                     AND (#{artistName} IS NULL OR a.name LIKE CONCAT('%', #{artistName}, '%'))
                     AND (#{album} IS NULL OR s.album LIKE CONCAT('%', #{album}, '%'))
             """)
-    IPage<SongVO> getSongsWithArtist(Page<SongVO> page,
-                                     @Param("songName") String songName,
-                                     @Param("artistName") String artistName,
-                                     @Param("album") String album);
+    IPage<SongVo> getSongsWithArtist(
+            Page<SongVo> page,
+            @Param("songName") String songName,
+            @Param("artistName") String artistName,
+            @Param("album") String album);
 
-    @Select("""
+    @Select(
+            """
                 SELECT
                     s.id AS songId,
                     s.name AS songName,
@@ -61,12 +63,14 @@ public interface SongMapper extends BaseMapper<Song> {
                     AND (#{album} IS NULL OR s.album LIKE CONCAT('%', #{album}, '%'))
                 ORDER BY s.release_time DESC
             """)
-    IPage<SongAdminVO> getSongsWithArtistName(Page<SongAdminVO> page,
-                                              @Param("artistId") Long artistId,
-                                              @Param("songName") String songName,
-                                              @Param("album") String album);
+    IPage<SongAdminVo> getSongsWithArtistName(
+            Page<SongAdminVo> page,
+            @Param("artistId") Long artistId,
+            @Param("songName") String songName,
+            @Param("album") String album);
 
-    @Select("""
+    @Select(
+            """
                 SELECT
                     s.id AS songId,
                     s.name AS songName,
@@ -80,20 +84,22 @@ public interface SongMapper extends BaseMapper<Song> {
                 LEFT JOIN tb_artist a ON s.artist_id = a.id
                 ORDER BY RAND() LIMIT 20
             """)
-    List<SongVO> getRandomSongsWithArtist();
+    List<SongVo> getRandomSongsWithArtist();
 
-    SongDetailVO getSongDetailById(Long songId);
+    SongDetailVo getSongDetailById(Long songId);
 
-    IPage<SongVO> getSongsByIds(@Param("userId") Long userId, Page<SongVO> page,
-                                @Param("songIds") List<Long> songIds,
-                                @Param("songName") String songName,
-                                @Param("artistName") String artistName,
-                                @Param("album") String album);
+    IPage<SongVo> getSongsByIds(
+            @Param("userId") Long userId,
+            Page<SongVo> page,
+            @Param("songIds") List<Long> songIds,
+            @Param("songName") String songName,
+            @Param("artistName") String artistName,
+            @Param("album") String album);
 
     List<Long> getFavoriteSongStyles(@Param("favoriteSongIds") List<Long> favoriteSongIds);
 
-    List<SongVO> getRecommendedSongsByStyles(@Param("sortedStyleIds") List<Long> sortedStyleIds,
-                                             @Param("favoriteSongIds") List<Long> favoriteSongIds,
-                                             @Param("limit") int limit);
-
+    List<SongVo> getRecommendedSongsByStyles(
+            @Param("sortedStyleIds") List<Long> sortedStyleIds,
+            @Param("favoriteSongIds") List<Long> favoriteSongIds,
+            @Param("limit") int limit);
 }

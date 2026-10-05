@@ -2,12 +2,11 @@ package com.silver.diary.utils;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
@@ -37,10 +36,7 @@ public class JwtUtil {
     }
 
     public void validateToken(String token) {
-        Jwts.parser()
-                .verifyWith( getSigningKey() )
-                .build()
-                .parseSignedClaims(normalize(token));
+        Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(normalize(token));
     }
 
     public String getUsername(String token) {
@@ -51,9 +47,14 @@ public class JwtUtil {
                 .getPayload()
                 .getSubject();
     }
+
     public Integer getVersion(String token) {
-        return Jwts.parser().verifyWith(getSigningKey()).build()
-                .parseSignedClaims(normalize(token)).getPayload().get("version", Integer.class);
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(normalize(token))
+                .getPayload()
+                .get("version", Integer.class);
     }
 
     private String normalize(String token) {

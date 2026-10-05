@@ -1,32 +1,30 @@
 package com.silver.music.service;
 
-import com.silver.music.dto.ArtistAddDto;
-import com.silver.music.dto.ArtistDto;
-import com.silver.music.dto.ArtistUpdateDto;
-import com.silver.music.entity.Artist;
-import com.silver.music.vo.ArtistDetailVO;
-import com.silver.music.vo.ArtistNameVO;
-import com.silver.music.vo.ArtistVO;
+import com.baomidou.mybatisplus.spring.service.IService;
 import com.silver.diary.common.PageResult;
 import com.silver.diary.common.Result;
-import com.baomidou.mybatisplus.spring.service.IService;
-import jakarta.servlet.http.HttpServletRequest;
-
+import com.silver.music.dto.ArtistAddDto;
+import com.silver.music.dto.ArtistQueryDto;
+import com.silver.music.dto.ArtistUpdateDto;
+import com.silver.music.entity.Artist;
+import com.silver.music.vo.ArtistDetailVo;
+import com.silver.music.vo.ArtistNameVo;
+import com.silver.music.vo.ArtistVo;
 import java.util.List;
 
 public interface ArtistService extends IService<Artist> {
 
-    Result<PageResult<ArtistVO>> getAllArtists(ArtistDto artistDto);
+    Result<PageResult<ArtistVo>> listArtists(ArtistQueryDto artistDto);
 
-    Result<PageResult<Artist>> getAllArtistsAndDetail(ArtistDto artistDto);
+    Result<PageResult<Artist>> listAdminArtists(ArtistQueryDto artistDto);
 
-    Result<List<ArtistNameVO>> getAllArtistNames();
+    Result<List<ArtistNameVo>> listArtistNames();
 
-    Result<List<ArtistVO>> getRandomArtists();
+    Result<List<ArtistVo>> getRandomArtists();
 
-    Result<ArtistDetailVO> getArtistDetail(Long artistId, HttpServletRequest request);
+    Result<ArtistDetailVo> getArtistDetail(Long artistId);
 
-    Result<Long> getAllArtistsCount(Integer gender, String area);
+    Result<Long> countArtists(Integer gender, String area);
 
     Result<Void> addArtist(ArtistAddDto artistAddDto);
 
@@ -37,5 +35,4 @@ public interface ArtistService extends IService<Artist> {
     Result<Void> deleteArtist(Long ArtistId);
 
     Result<Void> deleteArtists(List<Long> artistIds);
-
 }

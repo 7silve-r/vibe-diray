@@ -13,7 +13,7 @@ test('live diary', async ({ page, request }) => {
   const token = (await login.json()).data;
   const headers = { Authorization: 'Bearer ' + token };
   try {
-    await request.post('/backend/my/cate', {
+    await request.post('/backend/my/categories', {
       headers,
       data: { cateName: '浏览器测试', cateAlias: 'browser' },
     });

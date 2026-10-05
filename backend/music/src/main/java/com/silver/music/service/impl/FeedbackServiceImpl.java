@@ -1,37 +1,31 @@
 package com.silver.music.service.impl;
 
-import com.silver.diary.exception.BusinessException;
-
-import com.silver.music.constant.JwtClaimsConstant;
-import com.silver.music.constant.MessageConstant;
-import com.silver.music.mapper.FeedbackMapper;
-import com.silver.music.dto.FeedbackDto;
-import com.silver.music.entity.Feedback;
-import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
-import com.silver.music.service.FeedbackService;
-import com.silver.music.utils.CurrentUserUtil;
-import com.silver.music.utils.TypeConversionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
+import com.silver.diary.common.PageResult;
+import com.silver.diary.common.Result;
+import com.silver.diary.exception.BusinessException;
+import com.silver.diary.utils.SecurityUtil;
+import com.silver.music.constant.MessageConstant;
+import com.silver.music.dto.FeedbackQueryDto;
+import com.silver.music.entity.Feedback;
+import com.silver.music.mapper.FeedbackMapper;
+import com.silver.music.service.FeedbackService;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
 @Service
+public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback>
+        implements FeedbackService {
 
-public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> implements FeedbackService {
-
-    @Autowired
-    private FeedbackMapper feedbackMapper;
+    @Autowired private FeedbackMapper feedbackMapper;
 
     @Override
-    public Result<PageResult<Feedback>> getAllFeedbacks(FeedbackDto feedbackDto) {
+    public Result<PageResult<Feedback>> listFeedback(FeedbackQueryDto feedbackDto) {
 
         Page<Feedback> page = new Page<>(feedbackDto.getPageNum(), feedbackDto.getPageSize());
         QueryWrapper<Feedback> queryWrapper = new QueryWrapper<>();
@@ -42,9 +36,6 @@ public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> i
         queryWrapper.orderByDesc("create_time");
 
         IPage<Feedback> feedbackPage = feedbackMapper.selectPage(page, queryWrapper);
-        if (feedbackPage.getRecords().size() == 0) {
-            return Result.success(MessageConstant.DATA_NOT_FOUND, new PageResult<>(0L, null));
-        }
 
         return Result.success(new PageResult<>(feedbackPage.getTotal(), feedbackPage.getRecords()));
     }
@@ -67,10 +58,9 @@ public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> i
 
     @Override
     public Result<Void> addFeedback(String content) {
-        if (content == null || content.isBlank() || content.length() > 255) throw new BusinessException("反馈须为1到255字");
-        Map<String, Object> map = CurrentUserUtil.get();
-        Object userIdObj = map.get(JwtClaimsConstant.USER_ID);
-        Long userId = TypeConversionUtil.toLong(userIdObj);
+        if (content == null || content.isBlank() || content.length() > 255)
+            throw new BusinessException("反馈须为1到255字");
+        Long userId = SecurityUtil.userId().longValue();
 
         Feedback feedback = new Feedback();
         feedback.setUserId(userId);
@@ -82,5 +72,4 @@ public class FeedbackServiceImpl extends ServiceImpl<FeedbackMapper, Feedback> i
         }
         return Result.success(MessageConstant.ADD + MessageConstant.SUCCESS, null);
     }
-
 }

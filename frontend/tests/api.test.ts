@@ -9,7 +9,7 @@ it('auth', async () => {
   const fetcher = vi
     .spyOn(window, 'fetch')
     .mockResolvedValue(new Response(JSON.stringify({ code: 200, data: 42 })));
-  expect(await api('/my/userinfo')).toBe(42);
+  expect(await api('/my/profile')).toBe(42);
   expect(fetcher.mock.calls[0][1]?.headers).toHaveProperty('Authorization', 'Bearer test');
 });
 it('expired', async () => {
@@ -18,7 +18,7 @@ it('expired', async () => {
   vi.spyOn(window, 'fetch').mockResolvedValue(
     new Response(JSON.stringify({ code: 401, message: '请重新登录' }), { status: 401 }),
   );
-  await expect(api('/my/userinfo')).rejects.toThrow('请重新登录');
+  await expect(api('/my/profile')).rejects.toThrow('请重新登录');
   expect(callback).toHaveBeenCalledOnce();
 });
 it('offline', async () => {

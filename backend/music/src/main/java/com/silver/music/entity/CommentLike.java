@@ -8,6 +8,7 @@ import lombok.Data;
 public class CommentLike {
     @TableId(type = IdType.AUTO)
     private Long id;
+
     private Long commentId;
     private Integer userId;
 }

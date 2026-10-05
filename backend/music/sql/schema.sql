@@ -1,5 +1,5 @@
 -- Structure only, extracted from the local upstream schema. No account or content rows.
--- Use a NEW empty vibe_music database. This file is not a schema migration.
+-- Use a NEW empty music_diary database. This file is not a schema migration.
 CREATE DATABASE IF NOT EXISTS music_diary CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 USE music_diary;
 SET NAMES utf8mb4;

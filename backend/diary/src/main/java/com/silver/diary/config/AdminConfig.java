@@ -4,20 +4,22 @@ import com.silver.diary.entity.User;
 import com.silver.diary.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @ConditionalOnProperty(name = "admin.enabled", havingValue = "true", matchIfMissing = true)
 public class AdminConfig {
     @Bean
-    public ApplicationRunner admin(UserService users, @Value("${admin.password:}") String password) {
+    public ApplicationRunner admin(
+            UserService users, @Value("${admin.password:}") String password) {
         return args -> {
             User admin = users.lambdaQuery().eq(User::getUsername, "ADMIN").one();
             if (admin != null) {
-                if (!"ADMIN".equals(admin.getRole())) throw new IllegalStateException("ADMIN 账号角色不正确");
+                if (!"ADMIN".equals(admin.getRole()))
+                    throw new IllegalStateException("ADMIN 账号角色不正确");
                 return;
             }
             if (password.length() < 8 || password.length() > 64) {

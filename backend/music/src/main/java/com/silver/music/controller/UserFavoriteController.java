@@ -1,27 +1,27 @@
 package com.silver.music.controller;
 
-import com.silver.music.dto.PlaylistDto;
-import com.silver.music.dto.SongDto;
-import com.silver.music.vo.PlaylistVO;
-import com.silver.music.vo.SongVO;
 import com.silver.diary.common.PageResult;
 import com.silver.diary.common.Result;
+import com.silver.music.dto.PlaylistQueryDto;
+import com.silver.music.dto.SongQueryDto;
 import com.silver.music.service.UserFavoriteService;
+import com.silver.music.vo.PlaylistVo;
+import com.silver.music.vo.SongVo;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @PreAuthorize("hasRole('USER')")
 @RestController
 @RequestMapping("/music/favorite")
 public class UserFavoriteController {
 
-    @Autowired
-    private UserFavoriteService userFavoriteService;
+    @Autowired private UserFavoriteService userFavoriteService;
 
     @PostMapping("/getFavoriteSongs")
-    public Result<PageResult<SongVO>> getUserFavoriteSongs(@RequestBody @Valid SongDto songDto) {
+    public Result<PageResult<SongVo>> getUserFavoriteSongs(
+            @RequestBody @Valid SongQueryDto songDto) {
         return userFavoriteService.getUserFavoriteSongs(songDto);
     }
 
@@ -36,7 +36,8 @@ public class UserFavoriteController {
     }
 
     @PostMapping("/getFavoritePlaylists")
-    public Result<PageResult<PlaylistVO>> getFavoritePlaylists(@RequestBody @Valid PlaylistDto playlistDto) {
+    public Result<PageResult<PlaylistVo>> getFavoritePlaylists(
+            @RequestBody @Valid PlaylistQueryDto playlistDto) {
         return userFavoriteService.getUserFavoritePlaylists(playlistDto);
     }
 

@@ -3,31 +3,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.8</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>com.silver</groupId>
+        <artifactId>vibe-backend</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>com.silver</groupId>
-    <artifactId>diary_backend</artifactId>
+    <artifactId>diary</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>diary_backend</name>
-    <description>diary_backend</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
+    <name>diary</name>
+    <description>diary</description>
     <properties>
-        <java.version>17</java.version>
         <jjwt.version>0.12.6</jjwt.version>
     </properties>
     <dependencies>

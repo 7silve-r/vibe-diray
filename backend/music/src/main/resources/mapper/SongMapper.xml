@@ -3,7 +3,7 @@
 <mapper namespace="com.silver.music.mapper.SongMapper">
 
 
-    <resultMap id="SongDetailVOResultMap" type="com.silver.music.vo.SongDetailVO">
+    <resultMap id="SongDetailResult" type="com.silver.music.vo.SongDetailVo">
         <id column="songId" property="songId"/>
         <result column="songName" property="songName"/>
         <result column="artistName" property="artistName"/>
@@ -13,7 +13,7 @@
         <result column="songCoverUrl" property="coverUrl"/>
         <result column="audioUrl" property="audioUrl"/>
         <result column="releaseTime" property="releaseTime"/>
-        <collection property="comments" ofType="com.silver.music.vo.CommentVO">
+        <collection property="comments" ofType="com.silver.music.vo.CommentVo">
             <id column="commentId" property="commentId"/>
             <result column="username" property="username"/>
             <result column="userAvatar" property="userAvatar"/>
@@ -24,7 +24,7 @@
     </resultMap>
 
 
-    <select id="getSongDetailById" resultMap="SongDetailVOResultMap">
+    <select id="getSongDetailById" resultMap="SongDetailResult">
         SELECT s.id           AS songId,
                s.name         AS songName,
                s.album        AS album,
@@ -48,7 +48,7 @@
     </select>
 
 
-    <select id="getSongsByIds" resultType="com.silver.music.vo.SongVO">
+    <select id="getSongsByIds" resultType="com.silver.music.vo.SongVo">
         SELECT
         s.id AS songId,
         s.name AS songName,
@@ -91,7 +91,7 @@
     </select>
 
 
-    <select id="getRecommendedSongsByStyles" resultType="com.silver.music.vo.SongVO">
+    <select id="getRecommendedSongsByStyles" resultType="com.silver.music.vo.SongVo">
         SELECT DISTINCT s.id AS songId, s.name AS songName, s.album,
         s.duration, s.cover_url AS coverUrl, s.audio_url AS audioUrl,
         s.release_time AS releaseTime, a.name AS artistName

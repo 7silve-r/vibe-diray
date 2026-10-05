@@ -34,7 +34,7 @@ const configs: Record<string, any> = {
     title: '歌曲',
     key: 'songId',
     name: 'songName',
-    list: 'getAllSongsByArtist',
+    list: 'listAdminSongs',
     add: 'addSong',
     update: 'updateSong',
     del: 'deleteSong',
@@ -51,7 +51,7 @@ const configs: Record<string, any> = {
     title: '歌手',
     key: 'artistId',
     name: 'artistName',
-    list: 'getAllArtists',
+    list: 'listArtists',
     add: 'addArtist',
     update: 'updateArtist',
     del: 'deleteArtist',
@@ -68,7 +68,7 @@ const configs: Record<string, any> = {
     title: '歌单',
     key: 'playlistId',
     name: 'title',
-    list: 'getAllPlaylists',
+    list: 'listPlaylists',
     add: 'addPlaylist',
     update: 'updatePlaylist',
     del: 'deletePlaylist',
@@ -83,7 +83,7 @@ const configs: Record<string, any> = {
     title: '轮播图',
     key: 'bannerId',
     name: 'bannerUrl',
-    list: 'getAllBanners',
+    list: 'listBanners',
     del: 'deleteBanner',
     batch: 'deleteBanners',
     fields: [],
@@ -92,7 +92,7 @@ const configs: Record<string, any> = {
     title: '反馈',
     key: 'feedbackId',
     name: 'feedback',
-    list: 'getAllFeedbacks',
+    list: 'listFeedback',
     del: 'deleteFeedback',
     batch: 'deleteFeedbacks',
     fields: [],
@@ -145,7 +145,7 @@ async function load() {
   }
 }
 async function options() {
-  artists.value = await api('/music/admin/getAllArtistNames');
+  artists.value = await api('/music/admin/listArtistNames');
   styles.value = await api('/music/public/styles');
 }
 async function open(row?: any) {
@@ -272,7 +272,7 @@ async function bind(row: any) {
     const all: any[] = [];
     let n = 1;
     while (true) {
-      const d = await api('/music/public/song/getAllSongs', 'POST', {
+      const d = await api('/music/public/song/listSongs', 'POST', {
         pageNum: n++,
         pageSize: 100,
       });

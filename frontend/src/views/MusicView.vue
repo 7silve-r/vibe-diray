@@ -71,14 +71,14 @@ async function load() {
       };
       let data: any;
       if (tab.value === 'songs')
-        data = await api('/music/public/song/getAllSongs', 'POST', {
+        data = await api('/music/public/song/listSongs', 'POST', {
           ...params,
           artistName: params.artistName,
         });
       else if (tab.value === 'playlists')
-        data = await api('/music/public/playlist/getAllPlaylists', 'POST', params);
+        data = await api('/music/public/playlist/listPlaylists', 'POST', params);
       else if (tab.value === 'artists')
-        data = await api('/music/public/artist/getAllArtists', 'POST', params);
+        data = await api('/music/public/artist/listArtists', 'POST', params);
       else if (tab.value === 'recommended')
         data = { list: await api('/music/public/song/getRecommendedSongs'), total: 0 };
       else
@@ -104,8 +104,8 @@ async function favorite() {
   await ui.run(async () => {
     const type = kind.value === 'song' ? 'Song' : 'Playlist';
     await api(
-      `/music/favorite/${detail.value.likeStatus ? 'cancelCollect' : 'collect'}${type}?${kind.value}Id=${id.value}`,
-      detail.value.likeStatus ? 'DELETE' : 'POST',
+      `/music/favorite/${detail.value.favoriteStatus ? 'cancelCollect' : 'collect'}${type}?${kind.value}Id=${id.value}`,
+      detail.value.favoriteStatus ? 'DELETE' : 'POST',
     );
     await load();
   }, '收藏已更新');
@@ -165,7 +165,7 @@ ui.run(async () => {
           >
             播放{{ kind === 'song' ? '' : '全部' }}</button
           ><button v-if="kind !== 'artist'" @click="favorite">
-            {{ detail.likeStatus ? '取消收藏' : '收藏' }}
+            {{ detail.favoriteStatus ? '取消收藏' : '收藏' }}
           </button>
         </div>
       </div>

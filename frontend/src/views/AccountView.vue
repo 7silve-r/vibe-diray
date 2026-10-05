@@ -55,7 +55,7 @@ async function avatar(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (file)
     await action(async () => {
-      await upload('/my/avator', file, 'PATCH');
+      await upload('/my/avatar', file, 'PATCH');
       await auth.refresh();
     }, '头像已更新');
 }
