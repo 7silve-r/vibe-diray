@@ -51,7 +51,12 @@ test('welcome', async ({ page }) => {
   await expect(page.locator('.gift-poem p')).toHaveCount(9);
   await expect(page.locator('.gift-poem')).toContainText('直起腰来，我望见蓝色的大海和帆影。');
   await expect(page.locator('.enter-hint')).toContainText('Enter');
-  await page.locator('.welcome-character img').evaluate((img: HTMLImageElement) => img.decode());
+  await page.locator('.sky-scene').evaluate((img: HTMLImageElement) => img.decode());
+  expect(
+    await page
+      .locator('.start-hint')
+      .evaluate((el) => el.getBoundingClientRect().bottom <= innerHeight),
+  ).toBe(true);
   await page.screenshot({ animations: 'disabled', path: 'test-results/welcome-desktop.png' });
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: '今日的一隅' })).toBeVisible();
@@ -194,10 +199,10 @@ test('sidebar and states', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '这个页面不存在' })).toBeVisible();
   await expect(page.locator('.mood-lost')).toBeVisible();
   await page.getByRole('link', { name: '返回主页', exact: true }).click();
-  await expect(page.locator('.studio-character img')).toBeVisible();
+  await expect(page.locator('.sky-scene')).toBeVisible();
   expect(
     await page
-      .locator('.studio-character img')
+      .locator('.sky-scene')
       .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0),
   ).toBe(true);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -234,7 +239,7 @@ test('poem mobile and motion', async ({ page }) => {
     fullPage: true,
   });
   await page.getByRole('button', { name: '点击任意处开始' }).press('Enter');
-  await expect(page.locator('.studio-character img')).toBeVisible();
+  await expect(page.locator('.sky-scene')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
