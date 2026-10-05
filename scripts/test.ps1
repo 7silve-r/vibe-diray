@@ -3,6 +3,8 @@ $sandbox = Join-Path ([IO.Path]::GetTempPath()) ('vibe-launcher-' + [Guid]::NewG
 New-Item -ItemType Directory -Path $sandbox | Out-Null
 $RuntimeDir = $sandbox
 $child = $null
+$originalRoot = $ProjectRoot
+$originalPassword = [Environment]::GetEnvironmentVariable('DB_PASSWORD', 'Process')
 function Assert-True($Value, [string]$Message) { if (!$Value) { throw $Message } }
 function Assert-Fails([scriptblock]$Action) {
     $failed = $false
@@ -10,6 +12,15 @@ function Assert-Fails([scriptblock]$Action) {
     Assert-True $failed 'Expected a failure.'
 }
 try {
+    $ProjectRoot = $sandbox
+    $envFile = Join-Path $sandbox '.env'
+    [IO.File]::WriteAllText($envFile, 'DB_PASSWORD=')
+    $env:DB_PASSWORD = 'test-old-value'
+    Import-Settings
+    Assert-True ([string]::IsNullOrEmpty([Environment]::GetEnvironmentVariable('DB_PASSWORD', 'Process'))) 'Explicit empty password must clear an inherited password.'
+    [IO.File]::WriteAllText($envFile, '# password key omitted')
+    Assert-Fails { Import-Settings }
+    $ProjectRoot = $originalRoot
     $fixture = Join-Path $sandbox 'test.env'
     [IO.File]::WriteAllText($fixture, '# comment' + "`n" + 'PASSWORD="a b#c=$value&x"' + "`nEMPTY=`nPORT=8081")
     $values = Read-EnvFile $fixture
@@ -48,6 +59,8 @@ try {
     Stop-Owned 'test'
     Write-Host 'Launcher tests passed: env parsing, ports, lock, HTTP readiness, process identity and repeated stop.'
 } finally {
+    $ProjectRoot = $originalRoot
+    [Environment]::SetEnvironmentVariable('DB_PASSWORD', $originalPassword, 'Process')
     if ($child -and !$child.HasExited) { Stop-Process -InputObject $child }
     Remove-Item Env:VIBE_TEST_PORT -ErrorAction SilentlyContinue
     $resolved = [IO.Path]::GetFullPath($sandbox)

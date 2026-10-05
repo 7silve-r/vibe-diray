@@ -33,7 +33,7 @@ if target.hostname not in ("localhost", "127.0.0.1", "::1"):
     raise SystemExit("只允许连接本机 MySQL。")
 if database != args.database or not re.fullmatch(r"[a-zA-Z0-9_]+", database):
     raise SystemExit("--database 必须与 DB_URL 中的库名完全一致。")
-if not env.get("DB_PASSWORD"):
+if "DB_PASSWORD" not in env:
     raise SystemExit("缺少 DB_PASSWORD。")
 mysql = shutil.which("mysql")
 if not mysql and env.get("MYSQL_HOME"):
