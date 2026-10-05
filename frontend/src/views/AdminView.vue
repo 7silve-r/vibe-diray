@@ -145,11 +145,18 @@ async function load() {
   }
 }
 async function options() {
-  artists.value = await api('/music/admin/listArtistNames');
+  const data = await api('/music/admin/listArtistNames');
+  artists.value = Array.isArray(data) ? data : [];
   styles.value = await api('/music/public/styles');
 }
-async function open(row?: any) {
-  edit.value = row ? { ...row } : { gender: 2, artistId: artists.value[0]?.artistId };
+function open(row?: any) {
+  edit.value = row
+    ? { ...row }
+    : tab.value === 'songs'
+      ? { artistId: artists.value[0]?.artistId }
+      : tab.value === 'artists'
+        ? { gender: 2 }
+        : {};
   if (tab.value === 'songs' && row) {
     const artist = artists.value.find((a) => a.artistName === row.artistName);
     edit.value.artistId = artist?.artistId;

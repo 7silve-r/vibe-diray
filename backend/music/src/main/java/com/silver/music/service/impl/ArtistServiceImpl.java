@@ -96,9 +96,6 @@ public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> impleme
     public Result<List<ArtistNameVo>> listArtistNames() {
         List<Artist> artists =
                 artistMapper.selectList(new QueryWrapper<Artist>().orderByDesc("id"));
-        if (artists.isEmpty()) {
-            return Result.success(MessageConstant.DATA_NOT_FOUND, null);
-        }
 
         List<ArtistNameVo> artistNameVoList =
                 artists.stream()
@@ -120,9 +117,6 @@ public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> impleme
         queryWrapper.last("ORDER BY RAND() LIMIT 10");
 
         List<Artist> artists = artistMapper.selectList(queryWrapper);
-        if (artists.isEmpty()) {
-            return Result.success(MessageConstant.DATA_NOT_FOUND, null);
-        }
 
         List<ArtistVo> artistVoList =
                 artists.stream()
