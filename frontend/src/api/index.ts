@@ -28,9 +28,13 @@ export async function api<T = any>(path: string, method = 'GET', body?: unknown)
       method,
       headers,
       body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body),
-      signal: AbortSignal.timeout(20000),
+      signal: AbortSignal.timeout(body instanceof FormData ? 120000 : 20000),
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'TimeoutError')
+      throw new ApiError(
+        body instanceof FormData ? '上传超时，请稍后检查文件是否已保存' : '请求超时，请稍后重试',
+      );
     throw new ApiError('暂时连接不上服务，请稍后重试');
   }
   const result = await response.json().catch(() => null);
@@ -53,6 +57,9 @@ export async function upload(
   method = 'PUT',
   values: Record<string, string> = {},
 ) {
+  const audio = /\/songs\/[^/]+\/audio$/.test(path);
+  const limit = (audio ? 50 : 5) * 1024 * 1024;
+  if (file.size > limit) throw new ApiError(audio ? '音频不能超过50MB' : '图片不能超过5MB', 413);
   const data = new FormData();
   data.append('file', file);
   Object.entries(values).forEach(([k, v]) => data.append(k, v));

@@ -1,5 +1,5 @@
 import { beforeEach, it, expect, vi } from 'vitest';
-import { api, media, query } from '../src/api';
+import { api, media, query, upload } from '../src/api';
 beforeEach(() => {
   sessionStorage.clear();
   vi.restoreAllMocks();
@@ -31,4 +31,20 @@ it('media', () => {
   expect(query({ state: '公开', pageNum: 1, empty: '' })).toBe(
     'state=%E5%85%AC%E5%BC%80&pageNum=1',
   );
+});
+
+it('large audio', async () => {
+  const file = new File(['audio'], 'large.mp3', { type: 'audio/mpeg' });
+  Object.defineProperty(file, 'size', { value: 51 * 1024 * 1024 });
+  const fetcher = vi.spyOn(window, 'fetch');
+  await expect(upload('/music/admin/songs/1/audio', file)).rejects.toThrow('音频不能超过50MB');
+  expect(fetcher).not.toHaveBeenCalled();
+});
+it('upload timeout', async () => {
+  const timeout = vi.spyOn(AbortSignal, 'timeout');
+  vi.spyOn(window, 'fetch').mockRejectedValue(new DOMException('timeout', 'TimeoutError'));
+  await expect(
+    upload('/music/admin/songs/1/audio', new File(['audio'], 'song.mp3')),
+  ).rejects.toThrow('上传超时');
+  expect(timeout).toHaveBeenCalledWith(120000);
 });
