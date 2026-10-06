@@ -2,7 +2,6 @@ package com.silver.music.service;
 
 import com.baomidou.mybatisplus.spring.service.IService;
 import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
 import com.silver.music.dto.PlaylistAddDto;
 import com.silver.music.dto.PlaylistQueryDto;
 import com.silver.music.dto.PlaylistUpdateDto;
@@ -13,23 +12,23 @@ import java.util.List;
 
 public interface PlaylistService extends IService<Playlist> {
 
-    Result<PageResult<PlaylistVo>> listPlaylists(PlaylistQueryDto playlistDto);
+    PageResult<PlaylistVo> listPlaylists(PlaylistQueryDto playlistDto);
 
-    Result<PageResult<Playlist>> listAdminPlaylists(PlaylistQueryDto playlistDto);
+    PageResult<Playlist> listAdminPlaylists(PlaylistQueryDto playlistDto);
 
-    Result<List<PlaylistVo>> getRecommendedPlaylists();
+    List<PlaylistVo> getRecommendedPlaylists();
 
-    Result<PlaylistDetailVo> getPlaylistDetail(Long playlistId);
+    PlaylistDetailVo getPlaylistDetail(Long playlistId);
 
-    Result<Long> countPlaylists(String style);
+    Long countPlaylists(String style);
 
-    Result<Void> addPlaylist(PlaylistAddDto playlistAddDto);
+    void addPlaylist(PlaylistAddDto playlistAddDto);
 
-    Result<Void> updatePlaylist(PlaylistUpdateDto playlistUpdateDto);
+    void updatePlaylist(PlaylistUpdateDto playlistUpdateDto);
 
-    Result<Void> updatePlaylistCover(Long playlistId, String coverUrl);
+    void updatePlaylistCover(Long playlistId, String coverUrl);
 
-    Result<Void> deletePlaylist(Long playlistId);
+    void deletePlaylist(Long playlistId);
 
-    Result<Void> deletePlaylists(List<Long> playlistIds);
+    void deletePlaylists(List<Long> playlistIds);
 }

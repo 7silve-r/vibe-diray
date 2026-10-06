@@ -20,16 +20,16 @@ public class PlaylistController {
     @PostMapping("/listPlaylists")
     public Result<PageResult<PlaylistVo>> listPlaylists(
             @RequestBody @Valid PlaylistQueryDto playlistDto) {
-        return playlistService.listPlaylists(playlistDto);
+        return Result.success(playlistService.listPlaylists(playlistDto));
     }
 
     @GetMapping("/getRecommendedPlaylists")
     public Result<List<PlaylistVo>> getRecommendedPlaylists() {
-        return playlistService.getRecommendedPlaylists();
+        return Result.success(playlistService.getRecommendedPlaylists());
     }
 
     @GetMapping("/getPlaylistDetail/{id}")
     public Result<PlaylistDetailVo> getPlaylistDetail(@PathVariable("id") Long playlistId) {
-        return playlistService.getPlaylistDetail(playlistId);
+        return Result.success(playlistService.getPlaylistDetail(playlistId));
     }
 }

@@ -19,16 +19,16 @@ public class ArtistController {
 
     @PostMapping("/listArtists")
     public Result<PageResult<ArtistVo>> listArtists(@RequestBody @Valid ArtistQueryDto artistDto) {
-        return artistService.listArtists(artistDto);
+        return Result.success(artistService.listArtists(artistDto));
     }
 
     @GetMapping("/getRandomArtists")
     public Result<List<ArtistVo>> getRandomArtists() {
-        return artistService.getRandomArtists();
+        return Result.success(artistService.getRandomArtists());
     }
 
     @GetMapping("/getArtistDetail/{id}")
     public Result<ArtistDetailVo> getArtistDetail(@PathVariable("id") Long artistId) {
-        return artistService.getArtistDetail(artistId);
+        return Result.success(artistService.getArtistDetail(artistId));
     }
 }

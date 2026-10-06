@@ -1,24 +1,25 @@
 package com.silver.music.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
 import com.silver.diary.exception.BusinessException;
 import com.silver.diary.utils.SecurityUtil;
-import com.silver.music.constant.MessageConstant;
 import com.silver.music.dto.PlaylistAddDto;
 import com.silver.music.dto.PlaylistQueryDto;
 import com.silver.music.dto.PlaylistUpdateDto;
 import com.silver.music.entity.Playlist;
 import com.silver.music.entity.UserFavorite;
 import com.silver.music.enumeration.FavoriteStatus;
+import com.silver.music.mapper.CommentMapper;
 import com.silver.music.mapper.PlaylistMapper;
+import com.silver.music.mapper.SongMapper;
 import com.silver.music.mapper.UserFavoriteMapper;
 import com.silver.music.service.MinioService;
 import com.silver.music.service.PlaylistService;
+import com.silver.music.upload.UploadCleanup;
 import com.silver.music.vo.PlaylistDetailVo;
 import com.silver.music.vo.PlaylistVo;
 import com.silver.music.vo.SongVo;
@@ -36,23 +37,25 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
         implements PlaylistService {
 
     @Autowired private PlaylistMapper playlistMapper;
+    @Autowired private SongMapper songMapper;
+    @Autowired private CommentMapper commentMapper;
     @Autowired private UserFavoriteMapper userFavoriteMapper;
     @Autowired private MinioService minioService;
 
     @Override
-    public Result<PageResult<PlaylistVo>> listPlaylists(PlaylistQueryDto playlistDto) {
+    public PageResult<PlaylistVo> listPlaylists(PlaylistQueryDto playlistDto) {
 
         Page<Playlist> page = new Page<>(playlistDto.getPageNum(), playlistDto.getPageSize());
-        QueryWrapper<Playlist> queryWrapper = new QueryWrapper<>();
+        LambdaQueryWrapper<Playlist> query = new LambdaQueryWrapper<>();
 
         if (playlistDto.getTitle() != null) {
-            queryWrapper.like("title", playlistDto.getTitle());
+            query.like(Playlist::getTitle, playlistDto.getTitle());
         }
         if (playlistDto.getStyle() != null && !playlistDto.getStyle().isBlank()) {
-            queryWrapper.eq("style", playlistDto.getStyle());
+            query.eq(Playlist::getStyle, playlistDto.getStyle());
         }
 
-        IPage<Playlist> playlistPage = playlistMapper.selectPage(page, queryWrapper);
+        IPage<Playlist> playlistPage = playlistMapper.selectPage(page, query);
 
         List<PlaylistVo> playlistVoList =
                 playlistPage.getRecords().stream()
@@ -64,41 +67,41 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
                                 })
                         .toList();
 
-        return Result.success(new PageResult<>(playlistPage.getTotal(), playlistVoList));
+        return new PageResult<>(playlistPage.getTotal(), playlistVoList);
     }
 
     @Override
-    public Result<PageResult<Playlist>> listAdminPlaylists(PlaylistQueryDto playlistDto) {
+    public PageResult<Playlist> listAdminPlaylists(PlaylistQueryDto playlistDto) {
 
         Page<Playlist> page = new Page<>(playlistDto.getPageNum(), playlistDto.getPageSize());
-        QueryWrapper<Playlist> queryWrapper = new QueryWrapper<>();
+        LambdaQueryWrapper<Playlist> query = new LambdaQueryWrapper<>();
 
         if (playlistDto.getTitle() != null) {
-            queryWrapper.like("title", playlistDto.getTitle());
+            query.like(Playlist::getTitle, playlistDto.getTitle());
         }
         if (playlistDto.getStyle() != null && !playlistDto.getStyle().isBlank()) {
-            queryWrapper.eq("style", playlistDto.getStyle());
+            query.eq(Playlist::getStyle, playlistDto.getStyle());
         }
 
-        queryWrapper.orderByDesc("id");
+        query.orderByDesc(Playlist::getPlaylistId);
 
-        IPage<Playlist> playlistPage = playlistMapper.selectPage(page, queryWrapper);
+        IPage<Playlist> playlistPage = playlistMapper.selectPage(page, query);
 
-        return Result.success(new PageResult<>(playlistPage.getTotal(), playlistPage.getRecords()));
+        return new PageResult<>(playlistPage.getTotal(), playlistPage.getRecords());
     }
 
     @Override
-    public Result<List<PlaylistVo>> getRecommendedPlaylists() {
+    public List<PlaylistVo> getRecommendedPlaylists() {
 
         Long userId = SecurityUtil.optionalUserId();
 
         if (userId == null) {
-            return Result.success(playlistMapper.getRandomPlaylists(10));
+            return playlistMapper.getRandomPlaylists(10);
         }
 
-        List<Long> favoritePlaylistIds = userFavoriteMapper.getFavoritePlaylistIdsByUserId(userId);
+        List<Long> favoritePlaylistIds = userFavoriteMapper.listPlaylistIds(userId);
         if (favoritePlaylistIds.isEmpty()) {
-            return Result.success(playlistMapper.getRandomPlaylists(10));
+            return playlistMapper.getRandomPlaylists(10);
         }
 
         List<String> favoriteStyles = playlistMapper.getFavoritePlaylistStyles(favoritePlaylistIds);
@@ -131,15 +134,19 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
             }
         }
 
-        return Result.success(recommendedPlaylists);
+        return recommendedPlaylists;
     }
 
     @Override
-    public Result<PlaylistDetailVo> getPlaylistDetail(Long playlistId) {
-        PlaylistDetailVo playlistDetailVo = playlistMapper.getPlaylistDetailById(playlistId);
-        if (playlistDetailVo == null) throw new BusinessException(404, "歌单不存在");
+    public PlaylistDetailVo getPlaylistDetail(Long playlistId) {
+        Playlist playlist = playlistMapper.selectById(playlistId);
+        if (playlist == null) throw new BusinessException(404, "歌单不存在");
 
-        List<SongVo> songVoList = playlistDetailVo.getSongs();
+        PlaylistDetailVo playlistDetailVo = new PlaylistDetailVo();
+        BeanUtils.copyProperties(playlist, playlistDetailVo);
+        List<SongVo> songVoList = songMapper.listByPlaylist(playlistId);
+        playlistDetailVo.setSongs(songVoList);
+        playlistDetailVo.setComments(commentMapper.listByTarget(playlistId, 1));
         songVoList.forEach(songVo -> songVo.setFavoriteStatus(FavoriteStatus.NONE.getId()));
         playlistDetailVo.setFavoriteStatus(FavoriteStatus.NONE.getId());
 
@@ -149,17 +156,19 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
 
             UserFavorite favoritePlaylist =
                     userFavoriteMapper.selectOne(
-                            new QueryWrapper<UserFavorite>()
-                                    .eq("user_id", userId)
-                                    .eq("type", 1)
-                                    .eq("playlist_id", playlistId));
+                            new LambdaQueryWrapper<UserFavorite>()
+                                    .eq(UserFavorite::getUserId, userId)
+                                    .eq(UserFavorite::getType, 1)
+                                    .eq(UserFavorite::getPlaylistId, playlistId));
             if (favoritePlaylist != null) {
                 playlistDetailVo.setFavoriteStatus(FavoriteStatus.SAVED.getId());
             }
 
             List<UserFavorite> favoriteSongs =
                     userFavoriteMapper.selectList(
-                            new QueryWrapper<UserFavorite>().eq("user_id", userId).eq("type", 0));
+                            new LambdaQueryWrapper<UserFavorite>()
+                                    .eq(UserFavorite::getUserId, userId)
+                                    .eq(UserFavorite::getType, 0));
 
             Set<Long> favoriteSongIds =
                     favoriteSongs.stream().map(UserFavorite::getSongId).collect(Collectors.toSet());
@@ -171,97 +180,91 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
             }
         }
 
-        return Result.success(playlistDetailVo);
+        return playlistDetailVo;
     }
 
     @Override
-    public Result<Long> countPlaylists(String style) {
-        QueryWrapper<Playlist> queryWrapper = new QueryWrapper<>();
+    public Long countPlaylists(String style) {
+        LambdaQueryWrapper<Playlist> query = new LambdaQueryWrapper<>();
         if (style != null && !style.isBlank()) {
-            queryWrapper.eq("style", style);
+            query.eq(Playlist::getStyle, style);
         }
 
-        return Result.success(playlistMapper.selectCount(queryWrapper));
+        return playlistMapper.selectCount(query);
     }
 
     @Override
     @Transactional
-    public Result<Void> addPlaylist(PlaylistAddDto playlistAddDto) {
-        QueryWrapper<Playlist> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("title", playlistAddDto.getTitle());
-        if (playlistMapper.selectCount(queryWrapper) > 0) {
-            throw new BusinessException(MessageConstant.PLAYLIST + MessageConstant.ALREADY_EXISTS);
+    public void addPlaylist(PlaylistAddDto playlistAddDto) {
+        LambdaQueryWrapper<Playlist> query = new LambdaQueryWrapper<>();
+        query.eq(Playlist::getTitle, playlistAddDto.getTitle());
+        if (playlistMapper.selectCount(query) > 0) {
+            throw new BusinessException("歌单已存在");
         }
 
         Playlist playlist = new Playlist();
         BeanUtils.copyProperties(playlistAddDto, playlist);
         playlistMapper.insert(playlist);
-
-        return Result.success(MessageConstant.ADD + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> updatePlaylist(PlaylistUpdateDto playlistUpdateDto) {
+    public void updatePlaylist(PlaylistUpdateDto playlistUpdateDto) {
         Long playlistId = playlistUpdateDto.getPlaylistId();
 
         Playlist playlistByTitle =
                 playlistMapper.selectOne(
-                        new QueryWrapper<Playlist>().eq("title", playlistUpdateDto.getTitle()));
+                        new LambdaQueryWrapper<Playlist>()
+                                .eq(Playlist::getTitle, playlistUpdateDto.getTitle()));
         if (playlistByTitle != null && !playlistByTitle.getPlaylistId().equals(playlistId)) {
-            throw new BusinessException(MessageConstant.PLAYLIST + MessageConstant.ALREADY_EXISTS);
+            throw new BusinessException("歌单已存在");
         }
 
         Playlist playlist = new Playlist();
         BeanUtils.copyProperties(playlistUpdateDto, playlist);
         if (playlistMapper.updateById(playlist) == 0) {
-            throw new BusinessException(MessageConstant.UPDATE + MessageConstant.FAILED);
+            throw new BusinessException("更新失败");
         }
-
-        return Result.success(MessageConstant.UPDATE + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> updatePlaylistCover(Long playlistId, String coverUrl) {
+    public void updatePlaylistCover(Long playlistId, String coverUrl) {
         Playlist playlist = playlistMapper.selectById(playlistId);
         if (playlist == null) throw new BusinessException(404, "资源不存在");
         String cover = playlist.getCoverUrl();
 
         playlist.setCoverUrl(coverUrl);
         if (playlistMapper.updateById(playlist) == 0) {
-            throw new BusinessException(MessageConstant.UPDATE + MessageConstant.FAILED);
+            throw new BusinessException("更新失败");
         }
 
-        com.silver.music.upload.UploadCleanup.afterCommit(minioService, cover);
-        return Result.success(MessageConstant.UPDATE + MessageConstant.SUCCESS, null);
+        UploadCleanup.afterCommit(minioService, cover);
     }
 
     @Override
     @Transactional
-    public Result<Void> deletePlaylist(Long playlistId) {
+    public void deletePlaylist(Long playlistId) {
 
         Playlist playlist = playlistMapper.selectById(playlistId);
         if (playlist == null) {
-            throw new BusinessException(MessageConstant.PLAYLIST + MessageConstant.NOT_FOUND);
+            throw new BusinessException("歌单不存在");
         }
         String coverUrl = playlist.getCoverUrl();
 
         if (coverUrl != null && !coverUrl.isEmpty()) {
-            com.silver.music.upload.UploadCleanup.afterCommit(minioService, coverUrl);
+            UploadCleanup.afterCommit(minioService, coverUrl);
         }
 
         if (playlistMapper.deleteById(playlistId) == 0) {
-            throw new BusinessException(MessageConstant.DELETE + MessageConstant.FAILED);
+            throw new BusinessException("删除失败");
         }
-
-        return Result.success(MessageConstant.DELETE + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> deletePlaylists(List<Long> playlistIds) {
-        List<Playlist> playlists = playlistMapper.selectBatchIds(playlistIds);
+    public void deletePlaylists(List<Long> playlistIds) {
+        List<Playlist> playlists = playlistMapper.selectByIds(playlistIds);
         List<String> coverUrlList =
                 playlists.stream()
                         .map(Playlist::getCoverUrl)
@@ -269,13 +272,11 @@ public class PlaylistServiceImpl extends ServiceImpl<PlaylistMapper, Playlist>
                         .toList();
 
         for (String coverUrl : coverUrlList) {
-            com.silver.music.upload.UploadCleanup.afterCommit(minioService, coverUrl);
+            UploadCleanup.afterCommit(minioService, coverUrl);
         }
 
-        if (playlistMapper.deleteBatchIds(playlistIds) == 0) {
-            throw new BusinessException(MessageConstant.DELETE + MessageConstant.FAILED);
+        if (playlistMapper.deleteByIds(playlistIds) == 0) {
+            throw new BusinessException("删除失败");
         }
-
-        return Result.success(MessageConstant.DELETE + MessageConstant.SUCCESS, null);
     }
 }

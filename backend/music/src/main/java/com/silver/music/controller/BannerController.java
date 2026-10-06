@@ -20,30 +20,33 @@ public class BannerController {
     @PostMapping("/music/admin/listBanners")
     @PreAuthorize("hasRole('ADMIN')")
     public Result<PageResult<Banner>> listBanners(@RequestBody @Valid BannerQueryDto bannerDto) {
-        return bannerService.listBanners(bannerDto);
+        return Result.success(bannerService.listBanners(bannerDto));
     }
 
     @PatchMapping("/music/admin/updateBannerStatus/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public Result<Void> updateBannerStatus(
             @PathVariable("id") Long bannerId, @RequestParam("status") Integer bannerStatus) {
-        return bannerService.updateBannerStatus(bannerId, bannerStatus);
+        bannerService.updateBannerStatus(bannerId, bannerStatus);
+        return Result.success();
     }
 
     @DeleteMapping("/music/admin/deleteBanner/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public Result<Void> deleteBanner(@PathVariable("id") Long bannerId) {
-        return bannerService.deleteBanner(bannerId);
+        bannerService.deleteBanner(bannerId);
+        return Result.success();
     }
 
     @DeleteMapping("/music/admin/deleteBanners")
     @PreAuthorize("hasRole('ADMIN')")
     public Result<Void> deleteBanners(@RequestBody List<Long> bannerIds) {
-        return bannerService.deleteBanners(bannerIds);
+        bannerService.deleteBanners(bannerIds);
+        return Result.success();
     }
 
     @GetMapping("/music/public/banner/getBannerList")
     public Result<List<BannerVo>> getBannerList() {
-        return bannerService.getBannerList();
+        return Result.success(bannerService.getBannerList());
     }
 }

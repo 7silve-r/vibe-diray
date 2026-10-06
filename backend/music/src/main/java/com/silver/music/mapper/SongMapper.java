@@ -8,32 +8,30 @@ import com.silver.music.vo.SongAdminVo;
 import com.silver.music.vo.SongDetailVo;
 import com.silver.music.vo.SongVo;
 import java.util.List;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-@Mapper
 public interface SongMapper extends BaseMapper<Song> {
     @Select("SELECT * FROM tb_song WHERE id = #{id} FOR UPDATE")
     Song lock(Long id);
 
     @Select(
             """
-                SELECT
-                    s.id AS songId,
-                    s.name AS songName,
-                    s.album,
-                    s.duration,
-                    s.cover_url AS coverUrl,
-                    s.audio_url AS audioUrl,
-                    s.release_time AS releaseTime,
-                    a.name AS artistName
-                FROM tb_song s
-                LEFT JOIN tb_artist a ON s.artist_id = a.id
-                WHERE
-                    (#{songName} IS NULL OR s.name LIKE CONCAT('%', #{songName}, '%'))
-                    AND (#{artistName} IS NULL OR a.name LIKE CONCAT('%', #{artistName}, '%'))
-                    AND (#{album} IS NULL OR s.album LIKE CONCAT('%', #{album}, '%'))
+            SELECT
+                s.id AS songId,
+                s.name AS songName,
+                s.album,
+                s.duration,
+                s.cover_url AS coverUrl,
+                s.audio_url AS audioUrl,
+                s.release_time AS releaseTime,
+                a.name AS artistName
+            FROM tb_song s
+            LEFT JOIN tb_artist a ON s.artist_id = a.id
+            WHERE
+                (#{songName} IS NULL OR s.name LIKE CONCAT('%', #{songName}, '%'))
+                AND (#{artistName} IS NULL OR a.name LIKE CONCAT('%', #{artistName}, '%'))
+                AND (#{album} IS NULL OR s.album LIKE CONCAT('%', #{album}, '%'))
             """)
     IPage<SongVo> getSongsWithArtist(
             Page<SongVo> page,
@@ -43,25 +41,25 @@ public interface SongMapper extends BaseMapper<Song> {
 
     @Select(
             """
-                SELECT
-                    s.id AS songId,
-                    s.name AS songName,
-                    s.artist_id AS artistId,
-                    s.album,
-                    s.lyric,
-                    s.duration,
-                    s.style,
-                    s.cover_url AS coverUrl,
-                    s.audio_url AS audioUrl,
-                    s.release_time AS releaseTime,
-                    a.name AS artistName
-                FROM tb_song s
-                LEFT JOIN tb_artist a ON s.artist_id = a.id
-                WHERE
-                    (#{artistId} IS NULL OR s.artist_id = #{artistId})
-                    AND(#{songName} IS NULL OR s.name LIKE CONCAT('%', #{songName}, '%'))
-                    AND (#{album} IS NULL OR s.album LIKE CONCAT('%', #{album}, '%'))
-                ORDER BY s.release_time DESC
+            SELECT
+                s.id AS songId,
+                s.name AS songName,
+                s.artist_id AS artistId,
+                s.album,
+                s.lyric,
+                s.duration,
+                s.style,
+                s.cover_url AS coverUrl,
+                s.audio_url AS audioUrl,
+                s.release_time AS releaseTime,
+                a.name AS artistName
+            FROM tb_song s
+            LEFT JOIN tb_artist a ON s.artist_id = a.id
+            WHERE
+                (#{artistId} IS NULL OR s.artist_id = #{artistId})
+                AND(#{songName} IS NULL OR s.name LIKE CONCAT('%', #{songName}, '%'))
+                AND (#{album} IS NULL OR s.album LIKE CONCAT('%', #{album}, '%'))
+            ORDER BY s.release_time DESC
             """)
     IPage<SongAdminVo> getSongsWithArtistName(
             Page<SongAdminVo> page,
@@ -71,7 +69,56 @@ public interface SongMapper extends BaseMapper<Song> {
 
     @Select(
             """
-                SELECT
+            SELECT
+                s.id AS songId,
+                s.name AS songName,
+                s.album,
+                s.duration,
+                s.cover_url AS coverUrl,
+                s.audio_url AS audioUrl,
+                s.release_time AS releaseTime,
+                a.name AS artistName
+            FROM tb_song s
+            LEFT JOIN tb_artist a ON s.artist_id = a.id
+            ORDER BY RAND() LIMIT 20
+            """)
+    List<SongVo> getRandomSongsWithArtist();
+
+    @Select(
+            """
+            SELECT s.id AS songId, s.name AS songName, s.album, s.lyric, s.duration,
+                   s.cover_url AS coverUrl, s.audio_url AS audioUrl, s.release_time AS releaseTime,
+                   a.name AS artistName
+            FROM tb_song s LEFT JOIN tb_artist a ON s.artist_id = a.id
+            WHERE s.id = #{songId}
+            """)
+    SongDetailVo getSongDetailById(Long songId);
+
+    @Select(
+            """
+            SELECT s.id AS songId, s.name AS songName, s.album, s.duration,
+                   s.cover_url AS coverUrl, s.audio_url AS audioUrl, s.release_time AS releaseTime,
+                   a.name AS artistName
+            FROM tb_song s LEFT JOIN tb_artist a ON s.artist_id = a.id
+            WHERE s.artist_id = #{artistId} ORDER BY s.id
+            """)
+    List<SongVo> listByArtist(Long artistId);
+
+    @Select(
+            """
+            SELECT s.id AS songId, s.name AS songName, s.album, s.duration,
+                   s.cover_url AS coverUrl, s.audio_url AS audioUrl, s.release_time AS releaseTime,
+                   a.name AS artistName
+            FROM tb_playlist_binding b JOIN tb_song s ON b.song_id = s.id
+            LEFT JOIN tb_artist a ON s.artist_id = a.id
+            WHERE b.playlist_id = #{playlistId} ORDER BY s.id
+            """)
+    List<SongVo> listByPlaylist(Long playlistId);
+
+    @Select(
+            """
+            <script>
+            SELECT
                     s.id AS songId,
                     s.name AS songName,
                     s.album,
@@ -80,14 +127,28 @@ public interface SongMapper extends BaseMapper<Song> {
                     s.audio_url AS audioUrl,
                     s.release_time AS releaseTime,
                     a.name AS artistName
-                FROM tb_song s
-                LEFT JOIN tb_artist a ON s.artist_id = a.id
-                ORDER BY RAND() LIMIT 20
+                    FROM tb_song s
+                    LEFT JOIN tb_artist a ON s.artist_id = a.id
+
+                    WHERE
+                    <if test="songIds != null and songIds.size() &gt; 0">
+                        s.id IN
+                        <foreach collection="songIds" item="id" open="(" separator="," close=")">
+                            #{id}
+                        </foreach>
+                    </if>
+                    <if test="songName != null and songName.trim() != ''">
+                        AND s.name LIKE CONCAT('%', #{songName}, '%')
+                    </if>
+                    <if test="artistName != null and artistName.trim() != ''">
+                        AND a.name LIKE CONCAT('%', #{artistName}, '%')
+                    </if>
+                    <if test="album != null and album.trim() != ''">
+                        AND s.album LIKE CONCAT('%', #{album}, '%')
+                    </if>
+                    ORDER BY (SELECT f.create_time FROM tb_user_favorite f WHERE f.song_id = s.id AND f.user_id = #{userId}) DESC
+            </script>
             """)
-    List<SongVo> getRandomSongsWithArtist();
-
-    SongDetailVo getSongDetailById(Long songId);
-
     IPage<SongVo> getSongsByIds(
             @Param("userId") Long userId,
             Page<SongVo> page,
@@ -96,8 +157,41 @@ public interface SongMapper extends BaseMapper<Song> {
             @Param("artistName") String artistName,
             @Param("album") String album);
 
+    @Select(
+            """
+            <script>
+            SELECT g.style_id
+                    FROM tb_genre g
+                    WHERE g.song_id IN
+                    <foreach item="item" collection="favoriteSongIds" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+            </script>
+            """)
     List<Long> getFavoriteSongStyles(@Param("favoriteSongIds") List<Long> favoriteSongIds);
 
+    @Select(
+            """
+            <script>
+            SELECT DISTINCT s.id AS songId, s.name AS songName, s.album,
+                    s.duration, s.cover_url AS coverUrl, s.audio_url AS audioUrl,
+                    s.release_time AS releaseTime, a.name AS artistName
+                    FROM tb_song s
+                    JOIN tb_genre g ON s.id = g.song_id
+                    JOIN tb_style st ON g.style_id = st.id
+                    LEFT JOIN tb_artist a ON s.artist_id = a.id
+                    WHERE g.style_id IN
+                    <foreach item="item" collection="sortedStyleIds" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    AND s.id NOT IN
+                    <foreach item="item" collection="favoriteSongIds" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                    ORDER BY s.release_time DESC
+                    LIMIT #{limit}
+            </script>
+            """)
     List<SongVo> getRecommendedSongsByStyles(
             @Param("sortedStyleIds") List<Long> sortedStyleIds,
             @Param("favoriteSongIds") List<Long> favoriteSongIds,

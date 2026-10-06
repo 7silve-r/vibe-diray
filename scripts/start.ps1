@@ -49,7 +49,7 @@ try {
         # Resolve uploads against the project root for the same location on every launch.
         $uploadDir = Get-Setting 'UPLOAD_DIR' './uploads/'
         if (![IO.Path]::IsPathRooted($uploadDir)) { $env:UPLOAD_DIR = [IO.Path]::GetFullPath((Join-Path $ProjectRoot $uploadDir)) }
-        $jar = Join-Path $backend 'music/target/vibe-backend.jar'
+        $jar = Join-Path $backend 'app/target/vibe-backend.jar'
         $running['backend'] = Start-Owned 'backend' $java @('-jar', ('"' + $jar + '"')) $ProjectRoot
         $started.Add('backend')
     }

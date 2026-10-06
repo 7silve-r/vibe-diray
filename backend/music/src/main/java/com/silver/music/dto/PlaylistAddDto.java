@@ -2,14 +2,10 @@ package com.silver.music.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import java.io.Serial;
-import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class PlaylistAddDto implements Serializable {
-
-    @Serial private static final long serialVersionUID = 1L;
+public class PlaylistAddDto {
 
     @NotBlank
     @Size(max = 100)

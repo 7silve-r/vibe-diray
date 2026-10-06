@@ -2,7 +2,6 @@ package com.silver.music.service;
 
 import com.baomidou.mybatisplus.spring.service.IService;
 import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
 import com.silver.music.dto.AdminSongQueryDto;
 import com.silver.music.dto.SongAddDto;
 import com.silver.music.dto.SongQueryDto;
@@ -15,25 +14,25 @@ import java.util.List;
 
 public interface SongService extends IService<Song> {
 
-    Result<PageResult<SongVo>> listSongs(SongQueryDto songDto);
+    PageResult<SongVo> listSongs(SongQueryDto songDto);
 
-    Result<PageResult<SongAdminVo>> listAdminSongs(AdminSongQueryDto songDto);
+    PageResult<SongAdminVo> listAdminSongs(AdminSongQueryDto songDto);
 
-    Result<List<SongVo>> getRecommendedSongs();
+    List<SongVo> getRecommendedSongs();
 
-    Result<SongDetailVo> getSongDetail(Long songId);
+    SongDetailVo getSongDetail(Long songId);
 
-    Result<Long> countSongs(String style);
+    Long countSongs(String style);
 
-    Result<Void> addSong(SongAddDto songAddDto);
+    void addSong(SongAddDto songAddDto);
 
-    Result<Void> updateSong(SongUpdateDto songUpdateDto);
+    void updateSong(SongUpdateDto songUpdateDto);
 
-    Result<Void> updateSongCover(Long songId, String coverUrl);
+    void updateSongCover(Long songId, String coverUrl);
 
-    Result<Void> updateSongAudio(Long songId, String audioUrl, String duration);
+    void updateSongAudio(Long songId, String audioUrl, String duration);
 
-    Result<Void> deleteSong(Long songId);
+    void deleteSong(Long songId);
 
-    Result<Void> deleteSongs(List<Long> songIds);
+    void deleteSongs(List<Long> songIds);
 }

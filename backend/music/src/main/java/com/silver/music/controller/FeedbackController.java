@@ -20,24 +20,27 @@ public class FeedbackController {
     @PreAuthorize("hasRole('ADMIN')")
     public Result<PageResult<Feedback>> listFeedback(
             @RequestBody @Valid FeedbackQueryDto feedbackDto) {
-        return feedbackService.listFeedback(feedbackDto);
+        return Result.success(feedbackService.listFeedback(feedbackDto));
     }
 
     @DeleteMapping("/music/admin/deleteFeedback/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public Result<Void> deleteFeedback(@PathVariable("id") Long feedbackId) {
-        return feedbackService.deleteFeedback(feedbackId);
+        feedbackService.deleteFeedback(feedbackId);
+        return Result.success();
     }
 
     @DeleteMapping("/music/admin/deleteFeedbacks")
     @PreAuthorize("hasRole('ADMIN')")
     public Result<Void> deleteFeedbacks(@RequestBody List<Long> feedbackIds) {
-        return feedbackService.deleteFeedbacks(feedbackIds);
+        feedbackService.deleteFeedbacks(feedbackIds);
+        return Result.success();
     }
 
     @PostMapping("/music/feedback/addFeedback")
     @PreAuthorize("hasRole('USER')")
     public Result<Void> addFeedback(@RequestParam(value = "content") String content) {
-        return feedbackService.addFeedback(content);
+        feedbackService.addFeedback(content);
+        return Result.success();
     }
 }
