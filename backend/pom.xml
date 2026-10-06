@@ -18,6 +18,7 @@
     <modules>
         <module>diary</module>
         <module>music</module>
+        <module>app</module>
     </modules>
     <build>
         <plugins>
