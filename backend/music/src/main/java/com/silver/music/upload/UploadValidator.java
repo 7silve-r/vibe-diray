@@ -12,10 +12,10 @@ public final class UploadValidator {
     public record Content(byte[] bytes, String type, String extension) {}
 
     public static Content validate(MultipartFile file, boolean audio) throws IOException {
-        int limit = (audio ? 100 : 5) * 1024 * 1024;
+        int limit = (audio ? 50 : 5) * 1024 * 1024;
         if (file == null || file.isEmpty()) throw new BusinessException("请选择非空文件");
         if (file.getSize() > limit)
-            throw new BusinessException(413, audio ? "音频不能超过100MB" : "图片不能超过5MB");
+            throw new BusinessException(413, audio ? "音频不能超过50MB" : "图片不能超过5MB");
         byte[] bytes;
         try (var stream = file.getInputStream()) {
             bytes = stream.readNBytes(limit + 1);
