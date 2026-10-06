@@ -4,14 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import java.io.Serial;
-import java.io.Serializable;
 import lombok.Data;
 
 @Data
-public class PlaylistUpdateDto implements Serializable {
-
-    @Serial private static final long serialVersionUID = 1L;
+public class PlaylistUpdateDto {
 
     @NotNull @Positive private Long playlistId;
 

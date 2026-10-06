@@ -1,14 +1,12 @@
 package com.silver.music.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
 import com.silver.diary.exception.BusinessException;
 import com.silver.diary.utils.SecurityUtil;
-import com.silver.music.constant.MessageConstant;
 import com.silver.music.dto.AdminSongQueryDto;
 import com.silver.music.dto.SongAddDto;
 import com.silver.music.dto.SongQueryDto;
@@ -18,12 +16,14 @@ import com.silver.music.entity.Song;
 import com.silver.music.entity.Style;
 import com.silver.music.entity.UserFavorite;
 import com.silver.music.enumeration.FavoriteStatus;
+import com.silver.music.mapper.CommentMapper;
 import com.silver.music.mapper.GenreMapper;
 import com.silver.music.mapper.SongMapper;
 import com.silver.music.mapper.StyleMapper;
 import com.silver.music.mapper.UserFavoriteMapper;
 import com.silver.music.service.MinioService;
 import com.silver.music.service.SongService;
+import com.silver.music.upload.UploadCleanup;
 import com.silver.music.vo.SongAdminVo;
 import com.silver.music.vo.SongDetailVo;
 import com.silver.music.vo.SongVo;
@@ -39,13 +39,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements SongService {
 
     @Autowired private SongMapper songMapper;
+    @Autowired private CommentMapper commentMapper;
     @Autowired private UserFavoriteMapper userFavoriteMapper;
     @Autowired private StyleMapper styleMapper;
     @Autowired private GenreMapper genreMapper;
     @Autowired private MinioService minioService;
 
     @Override
-    public Result<PageResult<SongVo>> listSongs(SongQueryDto songDto) {
+    public PageResult<SongVo> listSongs(SongQueryDto songDto) {
 
         Long userId = SecurityUtil.optionalUserId();
 
@@ -63,7 +64,9 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
             List<UserFavorite> favoriteSongs =
                     userFavoriteMapper.selectList(
-                            new QueryWrapper<UserFavorite>().eq("user_id", userId).eq("type", 0));
+                            new LambdaQueryWrapper<UserFavorite>()
+                                    .eq(UserFavorite::getUserId, userId)
+                                    .eq(UserFavorite::getType, 0));
 
             Set<Long> favoriteSongIds =
                     favoriteSongs.stream().map(UserFavorite::getSongId).collect(Collectors.toSet());
@@ -75,32 +78,32 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             }
         }
 
-        return Result.success(new PageResult<>(songPage.getTotal(), songVoList));
+        return new PageResult<>(songPage.getTotal(), songVoList);
     }
 
     @Override
-    public Result<PageResult<SongAdminVo>> listAdminSongs(AdminSongQueryDto songDto) {
+    public PageResult<SongAdminVo> listAdminSongs(AdminSongQueryDto songDto) {
 
         Page<SongAdminVo> page = new Page<>(songDto.getPageNum(), songDto.getPageSize());
         IPage<SongAdminVo> songPage =
                 songMapper.getSongsWithArtistName(
                         page, songDto.getArtistId(), songDto.getSongName(), songDto.getAlbum());
 
-        return Result.success(new PageResult<>(songPage.getTotal(), songPage.getRecords()));
+        return new PageResult<>(songPage.getTotal(), songPage.getRecords());
     }
 
     @Override
-    public Result<List<SongVo>> getRecommendedSongs() {
+    public List<SongVo> getRecommendedSongs() {
 
         Long userId = SecurityUtil.optionalUserId();
 
         if (userId == null) {
-            return Result.success(songMapper.getRandomSongsWithArtist());
+            return songMapper.getRandomSongsWithArtist();
         }
 
-        List<Long> favoriteSongIds = userFavoriteMapper.getFavoriteSongIdsByUserId(userId);
+        List<Long> favoriteSongIds = userFavoriteMapper.listSongIds(userId);
         if (favoriteSongIds.isEmpty()) {
-            return Result.success(songMapper.getRandomSongsWithArtist());
+            return songMapper.getRandomSongsWithArtist();
         }
 
         List<Long> favoriteStyleIds = songMapper.getFavoriteSongStyles(favoriteSongIds);
@@ -138,13 +141,14 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             }
         }
 
-        return Result.success(recommendedSongs);
+        return recommendedSongs;
     }
 
     @Override
-    public Result<SongDetailVo> getSongDetail(Long songId) {
+    public SongDetailVo getSongDetail(Long songId) {
         SongDetailVo songDetailVo = songMapper.getSongDetailById(songId);
         if (songDetailVo == null) throw new BusinessException(404, "歌曲不存在");
+        songDetailVo.setComments(commentMapper.listByTarget(songId, 0));
         songDetailVo.setFavoriteStatus(FavoriteStatus.NONE.getId());
 
         Long userId = SecurityUtil.optionalUserId();
@@ -153,36 +157,36 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
 
             UserFavorite favoriteSong =
                     userFavoriteMapper.selectOne(
-                            new QueryWrapper<UserFavorite>()
-                                    .eq("user_id", userId)
-                                    .eq("type", 0)
-                                    .eq("song_id", songId));
+                            new LambdaQueryWrapper<UserFavorite>()
+                                    .eq(UserFavorite::getUserId, userId)
+                                    .eq(UserFavorite::getType, 0)
+                                    .eq(UserFavorite::getSongId, songId));
             if (favoriteSong != null) {
                 songDetailVo.setFavoriteStatus(FavoriteStatus.SAVED.getId());
             }
         }
 
-        return Result.success(songDetailVo);
+        return songDetailVo;
     }
 
     @Override
-    public Result<Long> countSongs(String style) {
-        QueryWrapper<Song> queryWrapper = new QueryWrapper<>();
+    public Long countSongs(String style) {
+        LambdaQueryWrapper<Song> query = new LambdaQueryWrapper<>();
         if (style != null) {
-            queryWrapper.like("style", style);
+            query.like(Song::getStyle, style);
         }
 
-        return Result.success(songMapper.selectCount(queryWrapper));
+        return songMapper.selectCount(query);
     }
 
     @Override
     @Transactional
-    public Result<Void> addSong(SongAddDto songAddDto) {
+    public void addSong(SongAddDto songAddDto) {
         Song song = new Song();
         BeanUtils.copyProperties(songAddDto, song);
 
         if (songMapper.insert(song) == 0) {
-            throw new BusinessException(MessageConstant.ADD + MessageConstant.FAILED);
+            throw new BusinessException("添加失败");
         }
 
         Long songId = song.getSongId();
@@ -192,7 +196,8 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
             List<String> styles = Arrays.asList(styleStr.split(","));
 
             List<Style> styleList =
-                    styleMapper.selectList(new QueryWrapper<Style>().in("name", styles));
+                    styleMapper.selectList(
+                            new LambdaQueryWrapper<Style>().in(Style::getName, styles));
 
             for (Style style : styleList) {
                 Genre genre = new Genre();
@@ -201,35 +206,34 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 genreMapper.insert(genre);
             }
         }
-
-        return Result.success(MessageConstant.ADD + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> updateSong(SongUpdateDto songUpdateDto) {
+    public void updateSong(SongUpdateDto songUpdateDto) {
 
-        Song songInDB = songMapper.selectById(songUpdateDto.getSongId());
-        if (songInDB == null) {
-            throw new BusinessException(MessageConstant.SONG + MessageConstant.NOT_FOUND);
+        Song existing = songMapper.selectById(songUpdateDto.getSongId());
+        if (existing == null) {
+            throw new BusinessException("歌曲不存在");
         }
 
         Song song = new Song();
         BeanUtils.copyProperties(songUpdateDto, song);
         if (songMapper.updateById(song) == 0) {
-            throw new BusinessException(MessageConstant.UPDATE + MessageConstant.FAILED);
+            throw new BusinessException("更新失败");
         }
 
         Long songId = songUpdateDto.getSongId();
 
-        genreMapper.delete(new QueryWrapper<Genre>().eq("song_id", songId));
+        genreMapper.delete(new LambdaQueryWrapper<Genre>().eq(Genre::getSongId, songId));
 
         String styleStr = songUpdateDto.getStyle();
         if (styleStr != null && !styleStr.isEmpty()) {
             List<String> styles = Arrays.asList(styleStr.split(","));
 
             List<Style> styleList =
-                    styleMapper.selectList(new QueryWrapper<Style>().in("name", styles));
+                    styleMapper.selectList(
+                            new LambdaQueryWrapper<Style>().in(Style::getName, styles));
 
             for (Style style : styleList) {
                 Genre genre = new Genre();
@@ -238,29 +242,26 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                 genreMapper.insert(genre);
             }
         }
-
-        return Result.success(MessageConstant.UPDATE + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> updateSongCover(Long songId, String coverUrl) {
+    public void updateSongCover(Long songId, String coverUrl) {
         Song song = songMapper.selectById(songId);
         if (song == null) throw new BusinessException(404, "资源不存在");
         String cover = song.getCoverUrl();
 
         song.setCoverUrl(coverUrl);
         if (songMapper.updateById(song) == 0) {
-            throw new BusinessException(MessageConstant.UPDATE + MessageConstant.FAILED);
+            throw new BusinessException("更新失败");
         }
 
-        com.silver.music.upload.UploadCleanup.afterCommit(minioService, cover);
-        return Result.success(MessageConstant.UPDATE + MessageConstant.SUCCESS, null);
+        UploadCleanup.afterCommit(minioService, cover);
     }
 
     @Override
     @Transactional
-    public Result<Void> updateSongAudio(Long songId, String audioUrl, String duration) {
+    public void updateSongAudio(Long songId, String audioUrl, String duration) {
         Song song = songMapper.selectById(songId);
         if (song == null) throw new BusinessException(404, "资源不存在");
         String audio = song.getAudioUrl();
@@ -268,40 +269,37 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
         song.setAudioUrl(audioUrl);
         song.setDuration(duration);
         if (songMapper.updateById(song) == 0) {
-            throw new BusinessException(MessageConstant.UPDATE + MessageConstant.FAILED);
+            throw new BusinessException("更新失败");
         }
 
-        com.silver.music.upload.UploadCleanup.afterCommit(minioService, audio);
-        return Result.success(MessageConstant.UPDATE + MessageConstant.SUCCESS, null);
+        UploadCleanup.afterCommit(minioService, audio);
     }
 
     @Override
     @Transactional
-    public Result<Void> deleteSong(Long songId) {
+    public void deleteSong(Long songId) {
         Song song = songMapper.selectById(songId);
         if (song == null) {
-            throw new BusinessException(MessageConstant.SONG + MessageConstant.NOT_FOUND);
+            throw new BusinessException("歌曲不存在");
         }
         String cover = song.getCoverUrl();
         String audio = song.getAudioUrl();
 
         if (cover != null && !cover.isEmpty()) {
-            com.silver.music.upload.UploadCleanup.afterCommit(minioService, cover);
+            UploadCleanup.afterCommit(minioService, cover);
         }
         if (audio != null && !audio.isEmpty()) {
-            com.silver.music.upload.UploadCleanup.afterCommit(minioService, audio);
+            UploadCleanup.afterCommit(minioService, audio);
         }
 
         if (songMapper.deleteById(songId) == 0) {
-            throw new BusinessException(MessageConstant.DELETE + MessageConstant.FAILED);
+            throw new BusinessException("删除失败");
         }
-
-        return Result.success(MessageConstant.DELETE + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> deleteSongs(List<Long> songIds) {
+    public void deleteSongs(List<Long> songIds) {
 
         List<Song> songs = songMapper.selectByIds(songIds);
         List<String> coverUrlList =
@@ -316,16 +314,14 @@ public class SongServiceImpl extends ServiceImpl<SongMapper, Song> implements So
                         .toList();
 
         for (String coverUrl : coverUrlList) {
-            com.silver.music.upload.UploadCleanup.afterCommit(minioService, coverUrl);
+            UploadCleanup.afterCommit(minioService, coverUrl);
         }
         for (String audioUrl : audioUrlList) {
-            com.silver.music.upload.UploadCleanup.afterCommit(minioService, audioUrl);
+            UploadCleanup.afterCommit(minioService, audioUrl);
         }
 
         if (songMapper.deleteByIds(songIds) == 0) {
-            throw new BusinessException(MessageConstant.DELETE + MessageConstant.FAILED);
+            throw new BusinessException("删除失败");
         }
-
-        return Result.success(MessageConstant.DELETE + MessageConstant.SUCCESS, null);
     }
 }

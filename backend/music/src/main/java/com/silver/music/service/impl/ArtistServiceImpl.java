@@ -1,14 +1,12 @@
 package com.silver.music.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 import com.silver.diary.common.PageResult;
-import com.silver.diary.common.Result;
 import com.silver.diary.exception.BusinessException;
 import com.silver.diary.utils.SecurityUtil;
-import com.silver.music.constant.MessageConstant;
 import com.silver.music.dto.ArtistAddDto;
 import com.silver.music.dto.ArtistQueryDto;
 import com.silver.music.dto.ArtistUpdateDto;
@@ -16,9 +14,11 @@ import com.silver.music.entity.Artist;
 import com.silver.music.entity.UserFavorite;
 import com.silver.music.enumeration.FavoriteStatus;
 import com.silver.music.mapper.ArtistMapper;
+import com.silver.music.mapper.SongMapper;
 import com.silver.music.mapper.UserFavoriteMapper;
 import com.silver.music.service.ArtistService;
 import com.silver.music.service.MinioService;
+import com.silver.music.upload.UploadCleanup;
 import com.silver.music.vo.ArtistDetailVo;
 import com.silver.music.vo.ArtistNameVo;
 import com.silver.music.vo.ArtistVo;
@@ -35,26 +35,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> implements ArtistService {
 
     @Autowired private ArtistMapper artistMapper;
+    @Autowired private SongMapper songMapper;
     @Autowired private UserFavoriteMapper userFavoriteMapper;
     @Autowired private MinioService minioService;
 
     @Override
-    public Result<PageResult<ArtistVo>> listArtists(ArtistQueryDto artistDto) {
+    public PageResult<ArtistVo> listArtists(ArtistQueryDto artistDto) {
 
         Page<Artist> page = new Page<>(artistDto.getPageNum(), artistDto.getPageSize());
-        QueryWrapper<Artist> queryWrapper = new QueryWrapper<>();
+        LambdaQueryWrapper<Artist> query = new LambdaQueryWrapper<>();
 
         if (artistDto.getArtistName() != null) {
-            queryWrapper.like("name", artistDto.getArtistName());
+            query.like(Artist::getArtistName, artistDto.getArtistName());
         }
         if (artistDto.getGender() != null) {
-            queryWrapper.eq("gender", artistDto.getGender());
+            query.eq(Artist::getGender, artistDto.getGender());
         }
         if (artistDto.getArea() != null) {
-            queryWrapper.like("area", artistDto.getArea());
+            query.like(Artist::getArea, artistDto.getArea());
         }
 
-        IPage<Artist> artistPage = artistMapper.selectPage(page, queryWrapper);
+        IPage<Artist> artistPage = artistMapper.selectPage(page, query);
 
         List<ArtistVo> artistVoList =
                 artistPage.getRecords().stream()
@@ -66,36 +67,37 @@ public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> impleme
                                 })
                         .toList();
 
-        return Result.success(new PageResult<>(artistPage.getTotal(), artistVoList));
+        return new PageResult<>(artistPage.getTotal(), artistVoList);
     }
 
     @Override
-    public Result<PageResult<Artist>> listAdminArtists(ArtistQueryDto artistDto) {
+    public PageResult<Artist> listAdminArtists(ArtistQueryDto artistDto) {
 
         Page<Artist> page = new Page<>(artistDto.getPageNum(), artistDto.getPageSize());
-        QueryWrapper<Artist> queryWrapper = new QueryWrapper<>();
+        LambdaQueryWrapper<Artist> query = new LambdaQueryWrapper<>();
 
         if (artistDto.getArtistName() != null) {
-            queryWrapper.like("name", artistDto.getArtistName());
+            query.like(Artist::getArtistName, artistDto.getArtistName());
         }
         if (artistDto.getGender() != null) {
-            queryWrapper.eq("gender", artistDto.getGender());
+            query.eq(Artist::getGender, artistDto.getGender());
         }
         if (artistDto.getArea() != null) {
-            queryWrapper.like("area", artistDto.getArea());
+            query.like(Artist::getArea, artistDto.getArea());
         }
 
-        queryWrapper.orderByDesc("id");
+        query.orderByDesc(Artist::getArtistId);
 
-        IPage<Artist> artistPage = artistMapper.selectPage(page, queryWrapper);
+        IPage<Artist> artistPage = artistMapper.selectPage(page, query);
 
-        return Result.success(new PageResult<>(artistPage.getTotal(), artistPage.getRecords()));
+        return new PageResult<>(artistPage.getTotal(), artistPage.getRecords());
     }
 
     @Override
-    public Result<List<ArtistNameVo>> listArtistNames() {
+    public List<ArtistNameVo> listArtistNames() {
         List<Artist> artists =
-                artistMapper.selectList(new QueryWrapper<Artist>().orderByDesc("id"));
+                artistMapper.selectList(
+                        new LambdaQueryWrapper<Artist>().orderByDesc(Artist::getArtistId));
 
         List<ArtistNameVo> artistNameVoList =
                 artists.stream()
@@ -108,15 +110,15 @@ public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> impleme
                                 })
                         .toList();
 
-        return Result.success(artistNameVoList);
+        return artistNameVoList;
     }
 
     @Override
-    public Result<List<ArtistVo>> getRandomArtists() {
-        QueryWrapper<Artist> queryWrapper = new QueryWrapper<>();
-        queryWrapper.last("ORDER BY RAND() LIMIT 10");
+    public List<ArtistVo> getRandomArtists() {
+        LambdaQueryWrapper<Artist> query = new LambdaQueryWrapper<>();
+        query.last("ORDER BY RAND() LIMIT 10");
 
-        List<Artist> artists = artistMapper.selectList(queryWrapper);
+        List<Artist> artists = artistMapper.selectList(query);
 
         List<ArtistVo> artistVoList =
                 artists.stream()
@@ -128,15 +130,17 @@ public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> impleme
                                 })
                         .toList();
 
-        return Result.success(artistVoList);
+        return artistVoList;
     }
 
     @Override
-    public Result<ArtistDetailVo> getArtistDetail(Long artistId) {
-        ArtistDetailVo artistDetailVo = artistMapper.getArtistDetailById(artistId);
-        if (artistDetailVo == null) throw new BusinessException(404, "歌手不存在");
+    public ArtistDetailVo getArtistDetail(Long artistId) {
+        Artist artist = artistMapper.selectById(artistId);
+        if (artist == null) throw new BusinessException(404, "歌手不存在");
 
-        List<SongVo> songVoList = artistDetailVo.getSongs();
+        ArtistDetailVo artistDetailVo = new ArtistDetailVo();
+        BeanUtils.copyProperties(artist, artistDetailVo);
+        List<SongVo> songVoList = songMapper.listByArtist(artistId);
         songVoList.forEach(songVo -> songVo.setFavoriteStatus(FavoriteStatus.NONE.getId()));
 
         Long userId = SecurityUtil.optionalUserId();
@@ -145,7 +149,9 @@ public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> impleme
 
             List<UserFavorite> favoriteSongs =
                     userFavoriteMapper.selectList(
-                            new QueryWrapper<UserFavorite>().eq("user_id", userId).eq("type", 0));
+                            new LambdaQueryWrapper<UserFavorite>()
+                                    .eq(UserFavorite::getUserId, userId)
+                                    .eq(UserFavorite::getType, 0));
 
             Set<Long> favoriteSongIds =
                     favoriteSongs.stream().map(UserFavorite::getSongId).collect(Collectors.toSet());
@@ -159,99 +165,93 @@ public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> impleme
 
         artistDetailVo.setSongs(songVoList);
 
-        return Result.success(artistDetailVo);
+        return artistDetailVo;
     }
 
     @Override
-    public Result<Long> countArtists(Integer gender, String area) {
-        QueryWrapper<Artist> queryWrapper = new QueryWrapper<>();
+    public Long countArtists(Integer gender, String area) {
+        LambdaQueryWrapper<Artist> query = new LambdaQueryWrapper<>();
         if (gender != null) {
-            queryWrapper.eq("gender", gender);
+            query.eq(Artist::getGender, gender);
         }
         if (area != null) {
-            queryWrapper.eq("area", area);
+            query.eq(Artist::getArea, area);
         }
 
-        return Result.success(artistMapper.selectCount(queryWrapper));
+        return artistMapper.selectCount(query);
     }
 
     @Override
     @Transactional
-    public Result<Void> addArtist(ArtistAddDto artistAddDto) {
-        QueryWrapper<Artist> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("name", artistAddDto.getArtistName());
-        if (artistMapper.selectCount(queryWrapper) > 0) {
-            throw new BusinessException(MessageConstant.ARTIST + MessageConstant.ALREADY_EXISTS);
+    public void addArtist(ArtistAddDto artistAddDto) {
+        LambdaQueryWrapper<Artist> query = new LambdaQueryWrapper<>();
+        query.eq(Artist::getArtistName, artistAddDto.getArtistName());
+        if (artistMapper.selectCount(query) > 0) {
+            throw new BusinessException("歌手已存在");
         }
 
         Artist artist = new Artist();
         BeanUtils.copyProperties(artistAddDto, artist);
         artistMapper.insert(artist);
-
-        return Result.success(MessageConstant.ADD + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> updateArtist(ArtistUpdateDto artistUpdateDto) {
+    public void updateArtist(ArtistUpdateDto artistUpdateDto) {
         Long artistId = artistUpdateDto.getArtistId();
 
         Artist artistByArtistName =
                 artistMapper.selectOne(
-                        new QueryWrapper<Artist>().eq("name", artistUpdateDto.getArtistName()));
+                        new LambdaQueryWrapper<Artist>()
+                                .eq(Artist::getArtistName, artistUpdateDto.getArtistName()));
         if (artistByArtistName != null && !artistByArtistName.getArtistId().equals(artistId)) {
-            throw new BusinessException(MessageConstant.ARTIST + MessageConstant.ALREADY_EXISTS);
+            throw new BusinessException("歌手已存在");
         }
 
         Artist artist = new Artist();
         BeanUtils.copyProperties(artistUpdateDto, artist);
         if (artistMapper.updateById(artist) == 0) {
-            throw new BusinessException(MessageConstant.UPDATE + MessageConstant.FAILED);
+            throw new BusinessException("更新失败");
         }
-
-        return Result.success(MessageConstant.UPDATE + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> updateArtistAvatar(Long artistId, String avatar) {
+    public void updateArtistAvatar(Long artistId, String avatar) {
         Artist artist = artistMapper.selectById(artistId);
         if (artist == null) throw new BusinessException(404, "资源不存在");
         String avatarUrl = artist.getAvatar();
 
         artist.setAvatar(avatar);
         if (artistMapper.updateById(artist) == 0) {
-            throw new BusinessException(MessageConstant.UPDATE + MessageConstant.FAILED);
+            throw new BusinessException("更新失败");
         }
 
-        com.silver.music.upload.UploadCleanup.afterCommit(minioService, avatarUrl);
-        return Result.success(MessageConstant.UPDATE + MessageConstant.SUCCESS, null);
+        UploadCleanup.afterCommit(minioService, avatarUrl);
     }
 
     @Override
     @Transactional
-    public Result<Void> deleteArtist(Long artistId) {
+    public void deleteArtist(Long artistId) {
 
         Artist artist = artistMapper.selectById(artistId);
         if (artist == null) {
-            throw new BusinessException(MessageConstant.ARTIST + MessageConstant.NOT_FOUND);
+            throw new BusinessException("歌手不存在");
         }
         String avatarUrl = artist.getAvatar();
 
         if (avatarUrl != null && !avatarUrl.isEmpty()) {
-            com.silver.music.upload.UploadCleanup.afterCommit(minioService, avatarUrl);
+            UploadCleanup.afterCommit(minioService, avatarUrl);
         }
 
         if (artistMapper.deleteById(artistId) == 0) {
-            throw new BusinessException(MessageConstant.DELETE + MessageConstant.FAILED);
+            throw new BusinessException("删除失败");
         }
-
-        return Result.success(MessageConstant.DELETE + MessageConstant.SUCCESS, null);
     }
 
     @Override
     @Transactional
-    public Result<Void> deleteArtists(List<Long> artistIds) {
+    public void deleteArtists(List<Long> artistIds) {
 
         List<Artist> artists = artistMapper.selectByIds(artistIds);
         List<String> avatarUrlList =
@@ -261,13 +261,11 @@ public class ArtistServiceImpl extends ServiceImpl<ArtistMapper, Artist> impleme
                         .toList();
 
         for (String avatarUrl : avatarUrlList) {
-            com.silver.music.upload.UploadCleanup.afterCommit(minioService, avatarUrl);
+            UploadCleanup.afterCommit(minioService, avatarUrl);
         }
 
         if (artistMapper.deleteByIds(artistIds) == 0) {
-            throw new BusinessException(MessageConstant.DELETE + MessageConstant.FAILED);
+            throw new BusinessException("删除失败");
         }
-
-        return Result.success(MessageConstant.DELETE + MessageConstant.SUCCESS, null);
     }
 }

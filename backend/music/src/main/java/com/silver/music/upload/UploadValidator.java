@@ -3,6 +3,7 @@ package com.silver.music.upload;
 import com.silver.diary.exception.BusinessException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,7 +70,7 @@ public final class UploadValidator {
             return new Content(b, "audio/flac", ".flac");
         if (b.length >= 24
                 && text(b, 4, 4).equals("ftyp")
-                && java.util.Set.of("M4A ", "M4B ", "isom", "mp42").contains(text(b, 8, 4)))
+                && Set.of("M4A ", "M4B ", "isom", "mp42").contains(text(b, 8, 4)))
             return new Content(b, "audio/mp4", ".m4a");
         throw new BusinessException(415, "音频仅支持 MP3、WAV、OGG、FLAC、M4A");
     }

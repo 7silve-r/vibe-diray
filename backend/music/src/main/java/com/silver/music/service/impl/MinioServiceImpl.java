@@ -1,10 +1,14 @@
 package com.silver.music.service.impl;
 
+import com.silver.diary.exception.BusinessException;
 import com.silver.music.service.MinioService;
+import com.silver.music.upload.UploadValidator;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,13 +31,12 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public String uploadFile(MultipartFile file, String folder) {
-        if (!java.util.Set.of("users", "artists", "songCovers", "songs", "playlists", "banners")
+        if (!Set.of("users", "artists", "songCovers", "songs", "playlists", "banners")
                 .contains(folder)) throw new IllegalArgumentException("Unsupported storage folder");
         try {
-            var content =
-                    com.silver.music.upload.UploadValidator.validate(file, folder.equals("songs"));
+            var content = UploadValidator.validate(file, folder.equals("songs"));
             String fileName = folder + "/" + UUID.randomUUID() + content.extension();
-            try (InputStream stream = new java.io.ByteArrayInputStream(content.bytes())) {
+            try (InputStream stream = new ByteArrayInputStream(content.bytes())) {
                 minioClient.putObject(
                         PutObjectArgs.builder().bucket(bucketName).object(fileName).stream(
                                         stream, content.bytes().length, -1)
@@ -41,7 +44,7 @@ public class MinioServiceImpl implements MinioService {
                                 .build());
             }
             return endpoint.replaceAll("/+$", "") + "/" + bucketName + "/" + fileName;
-        } catch (com.silver.diary.exception.BusinessException ex) {
+        } catch (BusinessException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new IllegalStateException("文件上传失败", ex);

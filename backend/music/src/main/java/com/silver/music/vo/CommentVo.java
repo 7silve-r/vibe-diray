@@ -1,15 +1,11 @@
 package com.silver.music.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDate;
 import lombok.Data;
 
 @Data
-public class CommentVo implements Serializable {
-
-    @Serial private static final long serialVersionUID = 1L;
+public class CommentVo {
 
     private Long commentId;
 

@@ -19,16 +19,16 @@ public class SongController {
 
     @PostMapping("/listSongs")
     public Result<PageResult<SongVo>> listSongs(@RequestBody @Valid SongQueryDto songDto) {
-        return songService.listSongs(songDto);
+        return Result.success(songService.listSongs(songDto));
     }
 
     @GetMapping("/getRecommendedSongs")
     public Result<List<SongVo>> getRecommendedSongs() {
-        return songService.getRecommendedSongs();
+        return Result.success(songService.getRecommendedSongs());
     }
 
     @GetMapping("/getSongDetail/{id}")
     public Result<SongDetailVo> getSongDetail(@PathVariable("id") Long songId) {
-        return songService.getSongDetail(songId);
+        return Result.success(songService.getSongDetail(songId));
     }
 }

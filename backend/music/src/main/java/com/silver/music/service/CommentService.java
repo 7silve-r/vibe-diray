@@ -1,20 +1,19 @@
 package com.silver.music.service;
 
 import com.baomidou.mybatisplus.spring.service.IService;
-import com.silver.diary.common.Result;
 import com.silver.music.dto.CommentPlaylistDto;
 import com.silver.music.dto.CommentSongDto;
 import com.silver.music.entity.Comment;
 
 public interface CommentService extends IService<Comment> {
 
-    Result<Void> addSongComment(CommentSongDto commentSongDto);
+    void addSongComment(CommentSongDto commentSongDto);
 
-    Result<Void> addPlaylistComment(CommentPlaylistDto commentPlaylistDto);
+    void addPlaylistComment(CommentPlaylistDto commentPlaylistDto);
 
-    Result<Void> likeComment(Long commentId);
+    void likeComment(Long commentId);
 
-    Result<Void> cancelLikeComment(Long commentId);
+    void cancelLikeComment(Long commentId);
 
-    Result<Void> deleteComment(Long commentId);
+    void deleteComment(Long commentId);
 }

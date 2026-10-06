@@ -22,32 +22,36 @@ public class UserFavoriteController {
     @PostMapping("/getFavoriteSongs")
     public Result<PageResult<SongVo>> getUserFavoriteSongs(
             @RequestBody @Valid SongQueryDto songDto) {
-        return userFavoriteService.getUserFavoriteSongs(songDto);
+        return Result.success(userFavoriteService.getUserFavoriteSongs(songDto));
     }
 
     @PostMapping("/collectSong")
     public Result<Void> collectSong(@RequestParam Long songId) {
-        return userFavoriteService.collectSong(songId);
+        userFavoriteService.collectSong(songId);
+        return Result.success();
     }
 
     @DeleteMapping("/cancelCollectSong")
     public Result<Void> cancelCollectSong(@RequestParam Long songId) {
-        return userFavoriteService.cancelCollectSong(songId);
+        userFavoriteService.cancelCollectSong(songId);
+        return Result.success();
     }
 
     @PostMapping("/getFavoritePlaylists")
     public Result<PageResult<PlaylistVo>> getFavoritePlaylists(
             @RequestBody @Valid PlaylistQueryDto playlistDto) {
-        return userFavoriteService.getUserFavoritePlaylists(playlistDto);
+        return Result.success(userFavoriteService.getUserFavoritePlaylists(playlistDto));
     }
 
     @PostMapping("/collectPlaylist")
     public Result<Void> collectPlaylist(@RequestParam Long playlistId) {
-        return userFavoriteService.collectPlaylist(playlistId);
+        userFavoriteService.collectPlaylist(playlistId);
+        return Result.success();
     }
 
     @DeleteMapping("/cancelCollectPlaylist")
     public Result<Void> cancelCollectPlaylist(@RequestParam Long playlistId) {
-        return userFavoriteService.cancelCollectPlaylist(playlistId);
+        userFavoriteService.cancelCollectPlaylist(playlistId);
+        return Result.success();
     }
 }

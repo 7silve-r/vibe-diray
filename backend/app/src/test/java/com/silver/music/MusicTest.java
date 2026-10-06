@@ -324,4 +324,159 @@ class MusicTest {
                 .andExpect(jsonPath("$.data.total").value(1))
                 .andExpect(jsonPath("$.data.list[0].playlistId").value(1));
     }
+
+    @Test
+    void details() throws Exception {
+        jdbc.update(
+                "INSERT INTO tb_song (id, name, artist_id, album, release_time, cover_url) VALUES (2, '另一首', 1, '专辑', CURRENT_DATE, '/song.png')");
+        jdbc.update("UPDATE tb_playlist SET cover_url = '/playlist.png' WHERE id = 1");
+        jdbc.update("INSERT INTO tb_playlist_binding (playlist_id, song_id) VALUES (1, 1), (1, 2)");
+        jdbc.update(
+                "INSERT INTO tb_comment (user_id, playlist_id, content, type, like_count, create_time) VALUES (1, 1, '评论一', 1, 2, CURRENT_TIMESTAMP), (2, 1, '评论二', 1, 3, CURRENT_TIMESTAMP)");
+        jdbc.update(
+                "INSERT INTO tb_comment (user_id, song_id, content, type, like_count, create_time) VALUES (1, 2, '歌曲评论', 0, 4, CURRENT_TIMESTAMP)");
+        mvc.perform(get("/music/public/playlist/getPlaylistDetail/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.coverUrl").value("/playlist.png"))
+                .andExpect(jsonPath("$.data.songs.length()").value(2))
+                .andExpect(jsonPath("$.data.songs[1].coverUrl").value("/song.png"))
+                .andExpect(jsonPath("$.data.comments.length()").value(2))
+                .andExpect(jsonPath("$.data.comments[0].username").value("writer01"))
+                .andExpect(jsonPath("$.data.comments[1].likeCount").value(3));
+        mvc.perform(get("/music/public/artist/getArtistDetail/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.artistName").value("歌手"))
+                .andExpect(jsonPath("$.data.songs.length()").value(2));
+        mvc.perform(get("/music/public/song/getSongDetail/2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.coverUrl").value("/song.png"))
+                .andExpect(jsonPath("$.data.comments.length()").value(1))
+                .andExpect(jsonPath("$.data.comments[0].content").value("歌曲评论"));
+    }
+
+    @Test
+    void emptyDetails() throws Exception {
+        jdbc.update("INSERT INTO tb_artist (id, name) VALUES (2, '空歌手')");
+        mvc.perform(get("/music/public/artist/getArtistDetail/2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.songs").isArray())
+                .andExpect(jsonPath("$.data.songs").isEmpty());
+        mvc.perform(get("/music/public/playlist/getPlaylistDetail/1"))
+                .andExpect(jsonPath("$.data.songs").isEmpty())
+                .andExpect(jsonPath("$.data.comments").isEmpty());
+        mvc.perform(get("/music/public/song/getSongDetail/1"))
+                .andExpect(jsonPath("$.data.comments").isEmpty());
+        mvc.perform(get("/music/public/artist/getArtistDetail/999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void favoriteFilter() throws Exception {
+        jdbc.update("INSERT INTO tb_playlist (id, title, style) VALUES (2, '轻音', '流行')");
+        jdbc.update(
+                "INSERT INTO tb_user_favorite (user_id, playlist_id, type, create_time) VALUES (1,1,1,'2026-01-01'), (1,2,1,'2026-01-02'), (2,2,1,'2026-01-03')");
+        mvc.perform(
+                        post("/music/favorite/getFavoritePlaylists")
+                                .header("Authorization", jwt.generateToken("writer01"))
+                                .contentType("application/json")
+                                .content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(2))
+                .andExpect(jsonPath("$.data.list[0].playlistId").value(2));
+        mvc.perform(
+                        post("/music/favorite/getFavoritePlaylists")
+                                .header("Authorization", jwt.generateToken("writer01"))
+                                .contentType("application/json")
+                                .content(
+"""
+{"title":"轻","style":"流行"}
+"""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(1));
+    }
+
+    @Test
+    void songStyles() throws Exception {
+        String token = jwt.generateToken("ADMIN");
+        jdbc.update("INSERT INTO tb_style (id, name) VALUES (1, '流行'), (2, '轻音乐')");
+        mvc.perform(
+                        post("/music/admin/addSong")
+                                .header("Authorization", token)
+                                .contentType("application/json")
+                                .content(
+"""
+{"artistId":1,"songName":"新歌","album":"专辑","style":"流行,轻音乐","releaseTime":"2026-10-06"}
+"""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+        Long id = jdbc.queryForObject("SELECT id FROM tb_song WHERE name = '新歌'", Long.class);
+        org.junit.jupiter.api.Assertions.assertEquals(
+                2,
+                jdbc.queryForObject(
+                        "SELECT COUNT(*) FROM tb_genre WHERE song_id = ?", Integer.class, id));
+        jdbc.update("INSERT INTO tb_genre (song_id, style_id) VALUES (1, 1)");
+        mvc.perform(
+                        post("/music/favorite/collectSong")
+                                .param("songId", "1")
+                                .header("Authorization", token))
+                .andExpect(status().isOk());
+        mvc.perform(get("/music/public/song/getRecommendedSongs").header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].songId").value(id));
+        mvc.perform(
+                        put("/music/admin/updateSong")
+                                .header("Authorization", token)
+                                .contentType("application/json")
+                                .content(
+                                        "{\"songId\":"
+                                                + id
+                                                + ",\"artistId\":1,\"songName\":\"新歌\",\"album\":\"专辑\",\"style\":\"轻音乐\",\"releaseTime\":\"2026-10-06\"}"))
+                .andExpect(status().isOk());
+        org.junit.jupiter.api.Assertions.assertEquals(
+                1,
+                jdbc.queryForObject(
+                        "SELECT COUNT(*) FROM tb_genre WHERE song_id = ?", Integer.class, id));
+    }
+
+    @Test
+    void adminQueries() throws Exception {
+        String token = jwt.generateToken("ADMIN");
+        jdbc.update("UPDATE tb_artist SET gender = 0, area = '中国' WHERE id = 1");
+        mvc.perform(
+                        post("/music/admin/listArtists")
+                                .header("Authorization", token)
+                                .contentType("application/json")
+                                .content(
+"""
+{"artistName":"歌","gender":0,"area":"中国"}
+"""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(1));
+        mvc.perform(
+                        post("/music/admin/listAdminSongs")
+                                .header("Authorization", token)
+                                .contentType("application/json")
+                                .content(
+"""
+{"artistId":1,"songName":"歌曲","album":"专辑"}
+"""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.list[0].artistName").value("歌手"));
+        jdbc.update(
+                "INSERT INTO tb_banner (id, banner_url, status) VALUES (1, '/banner.png', 0), (2, '/hidden.png', 1)");
+        mvc.perform(get("/music/public/banner/getBannerList"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(1));
+        mvc.perform(
+                        post("/music/admin/listBanners")
+                                .header("Authorization", token)
+                                .contentType("application/json")
+                                .content(
+"""
+{"bannerStatus":"DISABLE"}
+"""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.list[0].bannerId").value(2));
+    }
 }

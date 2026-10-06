@@ -18,27 +18,32 @@ public class CommentController {
 
     @PostMapping("/addSongComment")
     public Result<Void> addSongComment(@RequestBody @Valid CommentSongDto commentSongDto) {
-        return commentService.addSongComment(commentSongDto);
+        commentService.addSongComment(commentSongDto);
+        return Result.success();
     }
 
     @PostMapping("/addPlaylistComment")
     public Result<Void> addPlaylistComment(
             @RequestBody @Valid CommentPlaylistDto commentPlaylistDto) {
-        return commentService.addPlaylistComment(commentPlaylistDto);
+        commentService.addPlaylistComment(commentPlaylistDto);
+        return Result.success();
     }
 
     @PatchMapping("/likeComment/{id}")
     public Result<Void> likeComment(@PathVariable("id") Long commentId) {
-        return commentService.likeComment(commentId);
+        commentService.likeComment(commentId);
+        return Result.success();
     }
 
     @PatchMapping("/cancelLikeComment/{id}")
     public Result<Void> cancelLikeComment(@PathVariable("id") Long commentId) {
-        return commentService.cancelLikeComment(commentId);
+        commentService.cancelLikeComment(commentId);
+        return Result.success();
     }
 
     @DeleteMapping("/deleteComment/{id}")
     public Result<Void> deleteComment(@PathVariable("id") Long commentId) {
-        return commentService.deleteComment(commentId);
+        commentService.deleteComment(commentId);
+        return Result.success();
     }
 }
